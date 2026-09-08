@@ -87,6 +87,11 @@
   .onboard{ margin-top:36px; border-top:1px solid var(--line); padding-top:24px; }
   .onboard h4{ font-family:"Archivo"; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:4px; }
   .onboard .sub{ font-size:13px; color:var(--ink-soft); margin-bottom:14px; }
+  .company-input{
+    width:100%; border:1px solid var(--line); background:var(--panel); color:var(--ink);
+    padding:12px 14px; font-family:inherit; font-size:14px;
+  }
+  .company-input:focus{ outline:2px solid var(--focus); outline-offset:-1px; border-color:transparent; }
   .profile-grid{ display:flex; flex-direction:column; gap:8px; }
   .profile-opt{
     display:flex; gap:12px; align-items:flex-start; text-align:left;
@@ -186,6 +191,24 @@
   .about-note{ font-size:12.5px; color:var(--ink-soft); margin-top:44px; padding-top:18px; border-top:1px solid var(--line); }
 
   [hidden]{ display:none !important; }
+
+  .download-row{ margin-top:26px; }
+  .print-header{ display:none; }
+
+  @media print{
+    .topbar, .footer-nav, .plan-cta button, .download-row, .about-note, .onboard, .start-row{ display:none !important; }
+    * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; color-adjust:exact !important; }
+    body{ background:#fff; font-size:12px; }
+    #app{ max-width:100%; padding:0; }
+    .print-header{
+      display:block; margin-bottom:18px; padding-bottom:14px; border-bottom:2px solid var(--ink);
+    }
+    .print-header .ptitle{ font-family:"Archivo"; font-weight:800; font-size:20px; }
+    .print-header .pmeta{ margin-top:6px; font-size:11px; color:var(--ink-soft); }
+    .qcard, .matrix-item, .profile-note, .bar-row{ break-inside:avoid; }
+    .matrix-item{ margin-bottom:8px; }
+    a[href]:after{ content:""; }
+  }
 </style>
 
 <div class="topbar">
@@ -657,7 +680,7 @@
 
   /* ============ STATE ============ */
 
-  var state = { screen:"home", profile:null, dimIndex:0, answers:{}, showPlan:false };
+  var state = { screen:"home", profile:null, companyName:"", dimIndex:0, answers:{}, showPlan:false };
 
   var app = document.getElementById("app");
   var stitchWrap = document.getElementById("stitchWrap");
@@ -694,6 +717,11 @@
           '<p class="scope">Ouvert à toutes les entreprises marocaines du textile et de l\'habillement — de la filature à la confection, en sous-traitance comme sous marque propre.</p>'+
         '</div>'+
         '<div class="onboard">'+
+          '<h4>Nom de l\'entreprise (facultatif)</h4>'+
+          '<div class="sub">Utilisé uniquement pour personnaliser le constat que vous pourrez télécharger à la fin.</div>'+
+          '<input type="text" id="companyInput" class="company-input" placeholder="Ex. Atelier Textile El Fassi" value="'+esc(state.companyName)+'">'+
+        '</div>'+
+        '<div class="onboard">'+
           '<h4>Pour commencer</h4>'+
           '<div class="sub">Quel est votre positionnement principal dans la chaîne&nbsp;? Cela permet d\'adapter la lecture de votre résultat, sans changer les questions posées.</div>'+
           '<div class="profile-grid" id="profileGrid"></div>'+
@@ -707,6 +735,8 @@
     );
     app.innerHTML = "";
     app.appendChild(frag);
+
+    document.getElementById("companyInput").addEventListener("input", function(e){ state.companyName = e.target.value; });
 
     var grid = document.getElementById("profileGrid");
     PROFILES.forEach(function(p){
@@ -821,10 +851,19 @@
     }).join("");
 
     var profileHtml = "";
+    var profileLabel = "";
     if(state.profile){
       var p = PROFILES.filter(function(x){return x.key===state.profile;})[0];
-      if(p) profileHtml = '<div class="profile-note"><b>Votre positionnement — '+p.label+'</b>'+p.note+'</div>';
+      if(p){ profileHtml = '<div class="profile-note"><b>Votre positionnement — '+p.label+'</b>'+p.note+'</div>'; profileLabel = p.label; }
     }
+
+    var todayStr = new Date().toLocaleDateString("fr-FR", { day:"numeric", month:"long", year:"numeric" });
+    var printHeaderHtml = '<div class="print-header">'+
+      '<div class="ptitle">Constat DPP'+(state.companyName?' — '+esc(state.companyName):'')+'</div>'+
+      '<div class="pmeta">Diagnostic de maturité DPP Textile-Habillement · Réalisé le '+todayStr+
+        (profileLabel?' · Positionnement : '+profileLabel:'')+
+        ' · Basé sur le Guide opérationnel DPP — SIPPO / AMITH / Swisscontact</div>'+
+    '</div>';
 
     var planSectionHtml = state.showPlan
       ? '<hr class="section-divider">'+
@@ -838,6 +877,7 @@
 
     var frag = el(
       '<div>'+
+      printHeaderHtml+
       '<div class="result-head">'+
         '<div class="kicker">Diagnostic de maturité DPP</div>'+
         '<div class="score-row">'+
@@ -848,6 +888,7 @@
       '</div>'+
       '<div class="bars">'+barsHtml+'</div>'+
       profileHtml+
+      '<div class="download-row"><button class="btn accent" id="downloadPdf">⬇ Télécharger le constat (PDF)</button></div>'+
       planSectionHtml+
       '<div class="footer-nav">'+
         '<button class="btn ghost" id="retakeDiag">↺ Refaire le diagnostic</button>'+
@@ -857,6 +898,11 @@
     );
     app.innerHTML = "";
     app.appendChild(frag);
+
+    document.getElementById("downloadPdf").addEventListener("click", function(){
+      if(!state.showPlan){ state.showPlan = true; renderDiagResult(); }
+      window.print();
+    });
 
     var genBtn = document.getElementById("genPlan");
     if(genBtn) genBtn.addEventListener("click", function(){ state.showPlan = true; renderDiagResult(); window.scrollTo(0,0); });
