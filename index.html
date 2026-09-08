@@ -685,7 +685,7 @@
   /* URL du Google Apps Script Web App qui journalise chaque diagnostic dans un Google Sheet.
      Voir les instructions de déploiement fournies séparément. Laisser vide désactive l'envoi
      sans jamais bloquer l'expérience de l'entreprise qui répond au diagnostic. */
-  var SHEET_ENDPOINT = "";
+  var SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycbyjRxZcTJ-_IhjakhOWnu2sWT-MiklGfaKILd3jJnmQuS2Ds8LxnCyUhgTc10Bhqk669A/exec";
 
   function submitResultToSheet(payload){
     if(!SHEET_ENDPOINT) return;
