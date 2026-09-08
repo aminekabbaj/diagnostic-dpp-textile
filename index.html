@@ -1,0 +1,880 @@
+<title>Diagnostic DPP Textile-Habillement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12253C;
+    --ink-soft:#3E5064;
+    --paper:#F5F4EF;
+    --panel:#FFFFFF;
+    --panel-2:#EEEDE5;
+    --line:#D9D7CC;
+    --line-strong:#B9C1BC;
+    --accent:#146B52;
+    --accent-ink:#FFFFFF;
+    --accent-soft:#35B584;
+    --accent-wash:#E4F0EA;
+    --danger:#B8452E;
+    --danger-wash:#F6E4DE;
+    --warn:#B4790E;
+    --warn-wash:#F7ECD8;
+    --mid:#2C8C6E;
+    --mid-wash:#E1F1EA;
+    --good:#146B52;
+    --good-wash:#E4F0EA;
+    --focus:#2B6CB0;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#EDEFEE; --ink-soft:#AEB9C4; --paper:#0F1B2A; --panel:#16283C; --panel-2:#1C3247;
+      --line:#2A4359; --line-strong:#3B5A73; --accent:#3FBB92; --accent-ink:#08201A; --accent-soft:#3FBB92;
+      --accent-wash:#173328; --danger:#E38468; --danger-wash:#3A241E; --warn:#E4B65B; --warn-wash:#3A2E14;
+      --mid:#5FCBA6; --mid-wash:#153B2E; --good:#3FBB92; --good-wash:#173328; --focus:#7CB2E8;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#EDEFEE; --ink-soft:#AEB9C4; --paper:#0F1B2A; --panel:#16283C; --panel-2:#1C3247;
+    --line:#2A4359; --line-strong:#3B5A73; --accent:#3FBB92; --accent-ink:#08201A; --accent-soft:#3FBB92;
+    --accent-wash:#173328; --danger:#E38468; --danger-wash:#3A241E; --warn:#E4B65B; --warn-wash:#3A2E14;
+    --mid:#5FCBA6; --mid-wash:#153B2E; --good:#3FBB92; --good-wash:#173328; --focus:#7CB2E8;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size:15.5px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--accent-soft); color:var(--accent-ink); }
+  h1,h2,h3{ font-family:"Archivo", ui-sans-serif, system-ui, sans-serif; text-wrap:balance; margin:0; }
+  .mono{ font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  button{ font-family:inherit; }
+  a{ color:var(--accent); }
+  :focus-visible{ outline:2px solid var(--focus); outline-offset:2px; }
+
+  #app{ max-width:760px; margin:0 auto; padding:0 20px 80px; }
+
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:22px 20px 16px; max-width:760px; margin:0 auto; gap:16px; }
+  .brand{ display:flex; align-items:center; gap:10px; cursor:pointer; background:none; border:none; padding:0; color:inherit; }
+  .brand-mark{ width:30px; height:30px; border-radius:4px; background:var(--ink); color:var(--paper); display:flex; align-items:center; justify-content:center; font-family:"Archivo"; font-weight:800; font-size:12px; letter-spacing:.02em; flex:none; }
+  .brand-text{ display:flex; flex-direction:column; line-height:1.15; text-align:left; }
+  .brand-text b{ font-family:"Archivo"; font-weight:700; font-size:14.5px; }
+  .brand-text span{ font-size:11px; color:var(--ink-soft); letter-spacing:.03em; }
+  .eyebrow{ font-size:11px; font-weight:600; letter-spacing:.10em; text-transform:uppercase; color:var(--ink-soft); text-align:right; }
+
+  .stitch-wrap{ max-width:760px; margin:0 auto; padding:0 20px; background:var(--paper); }
+  .stitch-track{ position:relative; height:14px; width:100%;
+    background-image: repeating-linear-gradient(90deg, var(--line-strong) 0 7px, transparent 7px 14px);
+    background-position: 0 6px; background-size: 100% 2px; background-repeat:no-repeat; margin-bottom:6px; }
+  .stitch-fill{ position:absolute; left:0; top:0; height:14px;
+    background-image: repeating-linear-gradient(90deg, var(--accent) 0 7px, transparent 7px 14px);
+    background-position: 0 6px; background-size: 100% 2px; background-repeat:no-repeat; transition: width .35s ease; }
+  .stitch-needle{ position:absolute; top:-2px; width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; border-top:8px solid var(--accent); transform:translateX(-5px); transition:left .35s ease; }
+  .stitch-caption{ display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink-soft); padding-bottom:14px; }
+  .stitch-caption b{ color:var(--ink); font-weight:600; }
+
+  .hero{ padding:8px 0 6px; }
+  .hero h1{ font-size:32px; font-weight:800; letter-spacing:-.01em; }
+  .hero p.lede{ margin:14px 0 0; max-width:60ch; color:var(--ink-soft); font-size:16px; }
+  .hero .source{ margin-top:18px; display:inline-flex; align-items:center; gap:8px; font-size:12px; color:var(--ink-soft); border:1px solid var(--line); padding:6px 10px 6px 8px; }
+  .hero .source .dot{ width:6px; height:6px; background:var(--accent); flex:none; }
+  .hero .meta{ display:flex; gap:18px; margin-top:22px; font-size:12px; color:var(--ink-soft); flex-wrap:wrap; }
+  .hero .meta b{ color:var(--ink); font-family:"IBM Plex Mono"; }
+  .hero .scope{ margin-top:16px; font-size:12.5px; color:var(--ink-soft); }
+
+  .onboard{ margin-top:36px; border-top:1px solid var(--line); padding-top:24px; }
+  .onboard h4{ font-family:"Archivo"; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:4px; }
+  .onboard .sub{ font-size:13px; color:var(--ink-soft); margin-bottom:14px; }
+  .profile-grid{ display:flex; flex-direction:column; gap:8px; }
+  .profile-opt{
+    display:flex; gap:12px; align-items:flex-start; text-align:left;
+    border:1px solid var(--line); background:var(--panel); padding:13px 15px; cursor:pointer; color:var(--ink);
+  }
+  .profile-opt:hover{ border-color:var(--line-strong); }
+  .profile-opt.active{ border-color:var(--accent); background:var(--accent-wash); }
+  .profile-opt .dotmark{ flex:none; width:16px; height:16px; border-radius:50%; border:1px solid var(--line-strong); margin-top:2px; position:relative; }
+  .profile-opt.active .dotmark{ border-color:var(--accent); }
+  .profile-opt.active .dotmark::after{ content:""; position:absolute; inset:3px; border-radius:50%; background:var(--accent); }
+  .profile-opt .ptext b{ display:block; font-size:14px; font-weight:600; }
+  .profile-opt .ptext span{ display:block; font-size:12.5px; color:var(--ink-soft); margin-top:2px; }
+
+  .start-row{ margin-top:26px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .start-hint{ font-size:12px; color:var(--ink-soft); }
+
+  .qcard{ position:relative; background:var(--panel); border:1px solid var(--line); padding:30px 26px 26px; margin-top:6px; }
+  .qcard::before, .qcard::after{ content:""; position:absolute; top:16px; width:10px; height:10px; border-radius:50%; background:var(--paper); border:1px solid var(--line); }
+  .qcard::before{ left:16px; } .qcard::after{ right:16px; }
+  .qblock + .qblock{ margin-top:28px; padding-top:26px; border-top:1px dashed var(--line); }
+  .dim-label{ font-size:11px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+  .dim-intro{ font-size:12.5px; color:var(--ink-soft); margin-bottom:18px; max-width:64ch; }
+  .qcard h2{ font-size:15.5px; line-height:1.4; font-weight:700; margin-bottom:14px; }
+  .qnum{ display:inline-block; font-family:"IBM Plex Mono"; font-size:11px; color:var(--ink-soft); margin-right:6px; }
+
+  .scale-opt{ display:flex; flex-direction:column; gap:8px; }
+  .scale-opt button{
+    display:flex; align-items:flex-start; gap:11px; text-align:left;
+    border:1px solid var(--line); background:var(--panel); padding:11px 13px; cursor:pointer; color:var(--ink);
+    font-size:13.2px; line-height:1.42;
+  }
+  .scale-opt button:hover{ border-color:var(--line-strong); background:var(--panel-2); }
+  .scale-opt button.sel{ border-color:var(--accent); background:var(--accent-wash); }
+  .scale-opt button .num{
+    flex:none; width:20px; height:20px; border:1px solid var(--line-strong); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:"IBM Plex Mono"; font-size:10.5px; font-weight:600; color:var(--ink-soft); margin-top:1px;
+  }
+  .scale-opt button.sel .num{ border-color:var(--accent); background:var(--accent); color:var(--accent-ink); }
+
+  .nav-row{ display:flex; justify-content:space-between; margin-top:22px; align-items:center; }
+  .btn{ font-family:"Archivo"; font-weight:700; font-size:13.5px; letter-spacing:.01em; border:1px solid var(--ink); background:var(--ink); color:var(--paper); padding:12px 22px; cursor:pointer; }
+  .btn:hover{ opacity:.88; }
+  .btn:disabled{ opacity:.35; cursor:default; }
+  .btn.ghost{ background:transparent; color:var(--ink); }
+  .btn.ghost:hover{ background:var(--panel-2); }
+  .btn.accent{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  .nav-hint{ font-size:11.5px; color:var(--ink-soft); }
+
+  .result-head{ padding:10px 0 0; }
+  .result-head .kicker{ font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); }
+  .score-row{ display:flex; align-items:baseline; gap:18px; margin-top:10px; flex-wrap:wrap; }
+  .score-big{ font-family:"IBM Plex Mono"; font-weight:700; font-size:56px; line-height:1; }
+  .band-pill{ font-family:"Archivo"; font-weight:700; font-size:13px; padding:6px 14px; border:1px solid currentColor; }
+  .band-pill.good{ color:var(--good); background:var(--good-wash); border-color:var(--good); }
+  .band-pill.mid{ color:var(--mid); background:var(--mid-wash); border-color:var(--mid); }
+  .band-pill.warn{ color:var(--warn); background:var(--warn-wash); border-color:var(--warn); }
+  .band-pill.bad{ color:var(--danger); background:var(--danger-wash); border-color:var(--danger); }
+  .band-note{ margin-top:12px; color:var(--ink-soft); max-width:62ch; }
+
+  .bars{ margin-top:30px; display:flex; flex-direction:column; gap:14px; }
+  .bar-row{ display:grid; grid-template-columns:170px 1fr 40px; align-items:center; gap:12px; }
+  @media (max-width:640px){ .bar-row{ grid-template-columns:100px 1fr 32px; } }
+  .bar-row .name{ font-size:13px; font-weight:600; }
+  .bar-track{ height:10px; background:var(--panel-2); border:1px solid var(--line); position:relative; }
+  .bar-fill{ height:100%; background:var(--good); }
+  .bar-fill.mid{ background:var(--mid); }
+  .bar-fill.warn{ background:var(--warn); }
+  .bar-fill.bad{ background:var(--danger); }
+  .bar-row .val{ font-family:"IBM Plex Mono"; font-size:13px; text-align:right; color:var(--ink-soft); }
+
+  .plan-cta{ margin-top:34px; border:1px dashed var(--line-strong); background:var(--panel); padding:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .plan-cta .pc-text b{ display:block; font-family:"Archivo"; font-size:15px; margin-bottom:4px; }
+  .plan-cta .pc-text span{ font-size:12.5px; color:var(--ink-soft); }
+
+  .matrix-list{ margin-top:26px; display:flex; flex-direction:column; gap:14px; }
+  .matrix-item{ border:1px solid var(--line); background:var(--panel); padding:16px 18px 18px; }
+  .matrix-item.priority{ border-color:var(--accent); background:var(--accent-wash); }
+  .matrix-item .mrow{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; }
+  .matrix-item .mname{ font-family:"Archivo"; font-weight:700; font-size:13.5px; }
+  .matrix-item .mscore{ font-family:"IBM Plex Mono"; font-size:12px; color:var(--ink-soft); }
+  .matrix-item .maction{ margin:8px 0 14px; font-size:14.5px; font-weight:700; color:var(--ink); }
+  .term-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:640px){ .term-grid{ grid-template-columns:1fr; } }
+  .term-block{ background:var(--panel-2); border:1px solid var(--line); padding:12px 14px; }
+  .matrix-item.priority .term-block{ background:var(--panel); }
+  .term-block .tlabel{ font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; display:block; }
+  .term-block p{ margin:0 0 10px; font-size:13px; color:var(--ink); line-height:1.5; }
+  .term-block .techeance{ display:inline-flex; align-items:center; gap:5px; font-family:"IBM Plex Mono"; font-size:11px; color:var(--ink-soft); }
+  .term-block .techeance::before{ content:""; width:6px; height:6px; border-radius:50%; background:var(--accent); flex:none; }
+
+  .profile-note{ margin-top:26px; padding:16px 18px; background:var(--accent-wash); border:1px solid var(--accent); color:var(--ink); font-size:13.5px; }
+  .profile-note b{ display:block; font-family:"Archivo"; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+
+  .footer-nav{ display:flex; gap:10px; margin-top:40px; flex-wrap:wrap; }
+  .section-divider{ border:none; border-top:1px dashed var(--line); margin:36px 0; }
+  .about-note{ font-size:12.5px; color:var(--ink-soft); margin-top:44px; padding-top:18px; border-top:1px solid var(--line); }
+
+  [hidden]{ display:none !important; }
+</style>
+
+<div class="topbar">
+  <button class="brand" id="brandHome" aria-label="Retour à l'accueil">
+    <span class="brand-mark">DPP</span>
+    <span class="brand-text"><b>Diagnostic DPP Textile-Habillement</b><span>SIPPO Maroc · AMITH · Swisscontact</span></span>
+  </button>
+  <span class="eyebrow" id="modeLabel">Accueil</span>
+</div>
+
+<div class="stitch-wrap" id="stitchWrap" hidden>
+  <div class="stitch-track">
+    <div class="stitch-fill" id="stitchFill" style="width:0%"></div>
+    <div class="stitch-needle" id="stitchNeedle" style="left:0%"></div>
+  </div>
+  <div class="stitch-caption"><span id="stitchLeft"></span><b id="stitchRight"></b></div>
+</div>
+
+<div id="app"></div>
+
+<script>
+(function(){
+
+  /* ============ CONTENT ============ */
+
+  var PROFILES = [
+    { key:"amont", label:"Filature, tissage ou tricotage",
+      sub:"Vous transformez la fibre en fil ou en tissu, pour votre propre production ou pour des tiers.",
+      note:"Vos données concernent d'abord les procédés (chapitre 6) : consommation par lot, identité réelle des ateliers, volumes de chutes. Même si vous ne livrez jamais de vêtement fini, vous restez un maillon indispensable de la donnée transmise en amont — l'obligation de dépôt du DPP porte sur le produit fini, jamais sur vous directement." },
+    { key:"teinture", label:"Teinture, ennoblissement ou traitement",
+      sub:"Vous appliquez couleur, apprêts ou traitements chimiques sur fil ou tissu.",
+      note:"Vos données environnementales et chimiques sont particulièrement scrutées (chapitres 6 et 7) : fonctionnement réel de la station de traitement des effluents, fiches de données de sécurité produit par produit. Comme les autres façonniers, vous n'êtes pas responsable du dépôt du DPP, mais vos données conditionnent celui de vos clients." },
+    { key:"soustraitance", label:"Confection / façon — la matière vous est fournie",
+      sub:"Sous-traitance, admission temporaire sans paiement (ATPA). Vous coupez, montez, finissez ; le tissu appartient au donneur d'ordre jusqu'à la réexportation.",
+      note:"Sous ce régime, la matière reste la propriété du donneur d'ordre jusqu'à la réexportation. Votre charge de données reste concentrée sur le site et les procédés : vous n'avez pas à déclarer l'origine ou la composition de l'étoffe. Priorité : une fiche site stable, rattachée à un identifiant unique et permanent." },
+    { key:"cotraitance", label:"Confection en co-traitance",
+      sub:"Admission temporaire avec paiement (ATPA). Vous achetez tout ou partie du tissu, des accessoires, ou des deux.",
+      note:"Sous ce régime, vous achetez tout ou partie des intrants : vous devenez le seul acteur capable de documenter la chaîne amont des matières. Charge nettement supérieure. Priorité : sécuriser les certificats matière par lot, avant chaque commande, et non après." },
+    { key:"integre", label:"Entreprise intégrée",
+      sub:"Plusieurs étapes réunies en interne : filature, tissage ou teinture jusqu'à la confection.",
+      note:"Votre charge de données couvre plusieurs chapitres à la fois (matières, procédés, environnement). La cartographie (chapitre 10) est d'autant plus utile pour ne pas dupliquer les efforts entre vos propres ateliers, et pour clarifier qui, en interne, détient quelle donnée." },
+    { key:"marque", label:"Export sous votre propre marque",
+      sub:"Vous produisez et vendez des vêtements finis sous votre propre nom ou marque commerciale.",
+      note:"En exportant sous votre propre marque, vous devenez vous-même « fabricant » au sens du règlement ESPR : vous devrez veiller à ce qu'un mandataire ou un importateur établi dans l'UE assume les obligations formelles de dépôt du DPP en votre nom." },
+    { key:"mixte", label:"Mixte, ou je ne sais pas encore",
+      sub:"Une partie de votre activité relève d'un régime ou d'un segment, une partie d'un autre.",
+      note:"Déterminez d'abord, dans vos déclarations douanières, la part de votre chiffre d'affaires réalisée sous chaque régime ou segment : c'est cette donnée qui indique quel parcours vous concerne réellement, et dans quelle proportion." }
+  ];
+
+  var BANDS = [
+    { max:1.9, key:"bad",  name:"Non engagé", mkey:"nonengage", note:"Votre entreprise part de zéro sur ce volet : aucune action structurée n'est encore en place." },
+    { max:2.9, key:"warn", name:"Émergent",    mkey:"emergent",  note:"Des éléments existent mais restent dispersés, souvent portés par une seule personne." },
+    { max:3.9, key:"mid",  name:"Structuré",   mkey:"structure", note:"La pratique est établie mais pas encore systématique. Couverture incomplète." },
+    { max:5.01,key:"good", name:"Maîtrisé",    mkey:"maitrise",  note:"La dimension est pleinement intégrée, documentée et mise à jour." }
+  ];
+
+  function bandFor(score){
+    for(var i=0;i<BANDS.length;i++) if(score <= BANDS[i].max) return BANDS[i];
+    return BANDS[BANDS.length-1];
+  }
+
+  /* 48 questions, 6 dimensions x 8 — modelées sur l'Outil 1 (Questionnaire d'auto-évaluation
+     de maturité) du Guide opérationnel DPP, avec des réponses réécrites en descriptions
+     concrètes plutôt qu'une échelle abstraite. */
+
+  var DIMENSIONS = [
+    { key:"gouvernance", name:"Gouvernance",
+      intro:"Qui pilote le sujet, avec quel mandat, quel budget et quel suivi (chapitres 12-13).",
+      questions:[
+        { q:"Le sujet DPP / traçabilité est-il porté par quelqu'un dans votre entreprise ?", opts:[
+          "Personne n'en a la charge ; le sujet n'a jamais été discuté en interne.",
+          "Une personne en a entendu parler, sans mandat ni temps dédié.",
+          "Une personne suit le sujet de façon informelle, en plus de son poste habituel.",
+          "Un référent est désigné, avec un accord oral de la direction.",
+          "Un référent est désigné par écrit, avec un mandat clair et du temps dédié."]},
+        { q:"Ce référent dispose-t-il d'un mandat formalisé par la direction ?", opts:[
+          "Aucun mandat n'existe, même informel.",
+          "La direction est au courant mais n'a rien formalisé.",
+          "Un accord oral existe, sans document ni périmètre défini.",
+          "Un mandat écrit existe, mais sans moyens ni échéances précisés.",
+          "Un mandat écrit précise le périmètre, le temps alloué et les échéances."]},
+        { q:"Existe-t-il un comité ou un point de suivi régulier consacré au sujet ?", opts:[
+          "Aucun suivi n'existe ; le sujet n'est jamais à l'ordre du jour.",
+          "Le sujet est parfois évoqué de façon improvisée, sans rythme fixe.",
+          "Un point est fait occasionnellement, sans calendrier fixe.",
+          "Un point de suivi existe, à un rythme irrégulier.",
+          "Un comité ou point de suivi se réunit à intervalle régulier, avec compte-rendu."]},
+        { q:"La direction générale a-t-elle été informée des échéances réglementaires ?", opts:[
+          "La direction n'a jamais été informée du calendrier DPP.",
+          "La direction a entendu parler du sujet, sans détail sur le calendrier.",
+          "La direction connaît le sujet dans les grandes lignes, sans les échéances précises.",
+          "La direction a été informée du calendrier réglementaire de façon formelle.",
+          "La direction suit activement le calendrier et arbitre les décisions liées au DPP."]},
+        { q:"Les responsabilités entre fonctions sont-elles clarifiées (par exemple via une matrice RACI) ?", opts:[
+          "Aucune répartition des responsabilités n'existe entre fonctions.",
+          "Chacun agit de son côté, sans coordination ni répartition claire.",
+          "Une répartition informelle existe, jamais mise par écrit.",
+          "Une répartition des rôles existe par écrit, mais incomplète.",
+          "Une matrice de type RACI formalise clairement qui fait quoi."]},
+        { q:"Existe-t-il un budget identifié pour la préparation au DPP ?", opts:[
+          "Aucun budget n'a été envisagé pour ce sujet.",
+          "Le sujet a été mentionné en discussion budgétaire, sans suite.",
+          "Un ordre de grandeur informel existe, non validé.",
+          "Un budget indicatif a été validé pour une partie des actions.",
+          "Un budget dédié est validé et suit les postes de dépense identifiés."]},
+        { q:"Le sujet DPP est-il intégré aux objectifs annuels d'au moins une fonction ?", opts:[
+          "Le DPP n'apparaît dans les objectifs d'aucune fonction.",
+          "Le sujet est mentionné informellement, sans objectif chiffré.",
+          "Un objectif existe pour une fonction, de façon peu précise.",
+          "Un ou plusieurs objectifs liés au DPP figurent dans les objectifs annuels.",
+          "Le DPP fait partie des objectifs annuels d'au moins une fonction, suivis formellement."]},
+        { q:"L'entreprise dispose-t-elle d'un plan d'action écrit, même sommaire ?", opts:[
+          "Aucun plan, aucune réflexion engagée.",
+          "Le sujet a été évoqué en réunion, sans aucune trace écrite.",
+          "Une liste d'actions existe, non formalisée ni suivie.",
+          "Un plan écrit existe, avec des échéances approximatives.",
+          "Un plan écrit existe, avec échéances, responsables et suivi régulier."]}
+      ],
+      matrix:{
+        nonengage:{ action:"Désigner un référent DPP et obtenir un mandat écrit.",
+          court:{ objectif:"Choisir une personne (direction, qualité ou RSE) et formaliser par écrit son rôle, même à temps partiel — 1 à 2 jours par mois suffisent au départ.", echeance:"D'ici 4 semaines" },
+          moyen:{ objectif:"Mettre en place un point de suivi mensuel réunissant achats, production, qualité et IT, et rédiger un premier plan d'action d'une page.", echeance:"D'ici 3 mois" } },
+        emergent:{ action:"Formaliser un comité de suivi et rédiger un plan d'action.",
+          court:{ objectif:"Fixer un rythme mensuel au comité de suivi (référent, achats, production, qualité, IT) et son ordre du jour type.", echeance:"D'ici 6 semaines" },
+          moyen:{ objectif:"Rédiger un plan d'action détaillé avec échéance et responsable pour chaque action, relu à chaque comité.", echeance:"D'ici 6 mois" } },
+        structure:{ action:"Intégrer le DPP aux objectifs annuels, identifier un budget.",
+          court:{ objectif:"Chiffrer un budget indicatif à partir des postes déjà connus : temps du référent, essais de robustesse, QR code par pièce, éventuel outil (repère : 40 000 à 66 000 MAD en 1ʳᵉ année pour une PME).", echeance:"D'ici 2 mois" },
+          moyen:{ objectif:"Inscrire un objectif DPP mesurable dans les objectifs annuels du référent et d'au moins une fonction associée.", echeance:"D'ici 12 mois" } },
+        maitrise:{ action:"Assurer une veille réglementaire continue et un partage sectoriel.",
+          court:{ objectif:"Mettre en place une veille active sur la publication de l'acte délégué textile et les évolutions normatives.", echeance:"En continu, revue trimestrielle" },
+          moyen:{ objectif:"Partager votre retour d'expérience avec l'AMITH, le CTTH ou GTEX/MENATEX.", echeance:"D'ici 12 mois" } }
+      }},
+
+    { key:"donnees", name:"Données",
+      intro:"Ce que vous savez déjà de vos produits, matières, procédés et impacts (chapitres 4 à 10).",
+      questions:[
+        { q:"L'entreprise dispose-t-elle d'un registre centralisé de ses références produit ?", opts:[
+          "Aucun registre n'existe ; les références sont dispersées.",
+          "Une liste existe, mais incomplète et non mise à jour.",
+          "Un registre existe pour une partie des références seulement.",
+          "Un registre centralisé couvre la majorité des références exportées.",
+          "Un registre centralisé et à jour couvre l'ensemble des références."]},
+        { q:"La composition matière est-elle documentée pour chaque référence exportée vers l'Europe ?", opts:[
+          "La composition n'est ni demandée ni archivée.",
+          "Une étiquette de composition existe, sans vérification ni classement.",
+          "La composition est documentée pour certaines références seulement.",
+          "La composition est documentée pour la majorité des références.",
+          "La composition est documentée et archivée systématiquement, référence par référence."]},
+        { q:"L'origine des fibres est-elle connue et documentée pour chaque référence ?", opts:[
+          "L'origine des fibres n'est pas connue ni demandée.",
+          "L'information circule parfois oralement, jamais archivée.",
+          "L'origine est documentée pour quelques références sensibles.",
+          "L'origine est documentée pour la majorité des matières utilisées.",
+          "L'origine de chaque fibre est tracée et documentée par lot."]},
+        { q:"Les données sont-elles disponibles au niveau du lot de production ?", opts:[
+          "Aucune donnée n'est suivie au niveau du lot ; tout est global.",
+          "Le lot est identifié en atelier, sans donnée associée archivée.",
+          "Certaines données de lot sont conservées, de façon incomplète.",
+          "Les principales données sont disponibles par lot pour la majorité des références.",
+          "Les données sont systématiquement rattachées au lot correspondant."]},
+        { q:"Une cartographie des données (data mapping) a-t-elle été réalisée ?", opts:[
+          "Aucune cartographie n'a été engagée.",
+          "Le sujet a été évoqué, sans exercice réalisé.",
+          "Une cartographie partielle existe, sur quelques références.",
+          "Une cartographie couvre la majorité des références exportées vers l'UE.",
+          "Une cartographie complète identifie, pour chaque référence, les données disponibles et les écarts."]},
+        { q:"Les données environnementales de production sont-elles mesurées, même partiellement ?", opts:[
+          "Aucune donnée environnementale (eau, énergie, déchets) n'est mesurée.",
+          "Des factures globales existent, sans lien avec la production.",
+          "Certaines consommations sont suivies, de façon ponctuelle.",
+          "Les principales consommations sont mesurées par atelier ou par période.",
+          "Les données environnementales sont mesurées et rattachées à la production, au moins par lot."]},
+        { q:"Les données sociales et les certifications sont-elles centralisées dans un même registre ?", opts:[
+          "Aucune donnée sociale ni certification n'est centralisée.",
+          "Les documents existent mais sont dispersés entre services.",
+          "Une partie des audits et certifications est centralisée.",
+          "La majorité des données sociales et certifications sont centralisées et à jour.",
+          "L'ensemble des données sociales et certifications est centralisé, classé et à jour."]},
+        { q:"Les données logistiques et de fin de vie font-elles l'objet d'un suivi, même minimal ?", opts:[
+          "Aucun suivi du transport, de l'emballage ou de la fin de vie.",
+          "Quelques informations existent, jamais formalisées.",
+          "Un suivi partiel existe pour certaines références ou certains flux.",
+          "Les principales données logistiques sont documentées.",
+          "Le transport, l'emballage et les instructions de fin de vie sont documentés systématiquement."]}
+      ],
+      matrix:{
+        nonengage:{ action:"Créer un registre centralisé, même dans un simple tableur.",
+          court:{ objectif:"Ouvrir un registre unique listant vos 5 à 10 références les plus exportées : composition, fournisseur, poids, tailles.", echeance:"D'ici 4 semaines" },
+          moyen:{ objectif:"Étendre ce registre à l'ensemble de vos références exportées vers l'UE.", echeance:"D'ici 6 mois" } },
+        emergent:{ action:"Cartographier les données pour trois références pilotes.",
+          court:{ objectif:"Choisir 3 références représentatives et lister, pour chacune, les données attendues, qui les détient et sous quelle forme.", echeance:"D'ici 6 semaines" },
+          moyen:{ objectif:"Généraliser la cartographie à l'ensemble du portefeuille exporté vers l'UE.", echeance:"D'ici 9 mois" } },
+        structure:{ action:"Étendre la cartographie et combler les lacunes chez les sous-traitants.",
+          court:{ objectif:"Identifier les 3 lacunes de données les plus critiques détenues par des tiers (fournisseurs, sous-traitants).", echeance:"D'ici 1 mois" },
+          moyen:{ objectif:"Négocier et sécuriser la transmission de ces données avec les fournisseurs concernés.", echeance:"D'ici 9 mois" } },
+        maitrise:{ action:"Passer progressivement du niveau modèle au niveau lot.",
+          court:{ objectif:"Identifier les données qui exigent un passage au niveau lot (substances chimiques, contrôle qualité, rappel produit).", echeance:"D'ici 1 mois" },
+          moyen:{ objectif:"Basculer progressivement ces données du niveau modèle au niveau lot, référence par référence.", echeance:"D'ici 12 mois" } }
+      }},
+
+    { key:"systemes", name:"Systèmes d'information",
+      intro:"Vos outils actuels et leur capacité à produire une donnée structurée et exportable (chapitre 11).",
+      questions:[
+        { q:"L'entreprise dispose-t-elle d'un ERP en fonctionnement ?", opts:[
+          "Aucun ERP ; la gestion repose sur papier ou fichiers isolés.",
+          "Un ERP existe mais n'est utilisé que pour une fonction limitée (ex. comptabilité).",
+          "Un ERP couvre une partie de la production ou des stocks.",
+          "Un ERP structuré couvre la majorité des opérations.",
+          "Un ERP complet et à jour couvre l'ensemble des opérations de l'entreprise."]},
+        { q:"Cet ERP (ou système équivalent) intègre-t-il un module dédié aux données produit ?", opts:[
+          "Aucun module ou système ne centralise les données produit.",
+          "Les données produit sont dans des fichiers séparés, non reliés au système central.",
+          "Un module existe mais reste peu utilisé ou incomplet.",
+          "Un module dédié centralise la majorité des données produit.",
+          "Un module ou système dédié centralise l'ensemble des données produit."]},
+        { q:"L'entreprise a-t-elle évalué l'intérêt d'un système PIM ou PLM ?", opts:[
+          "Le sujet n'a jamais été évalué.",
+          "Le sujet a été mentionné, sans recherche ni comparaison.",
+          "Une recherche informelle a été menée, sans décision.",
+          "Une évaluation a été faite, avec une recommandation informelle.",
+          "Une évaluation formelle (besoins, coûts, options) a été réalisée."]},
+        { q:"Les données produit sont-elles accessibles sans recourir à des fichiers dispersés ?", opts:[
+          "Les données sont dispersées entre plusieurs fichiers et personnes.",
+          "Une tentative de centralisation existe, mais incohérente.",
+          "Une partie des données est centralisée, le reste reste dispersé.",
+          "La majorité des données produit sont centralisées et accessibles.",
+          "L'ensemble des données produit est centralisé et accessible à qui en a besoin."]},
+        { q:"Un identifiant physique (QR code ou équivalent) est-il déjà utilisé sur vos produits ?", opts:[
+          "Aucun identifiant physique n'est utilisé sur les produits.",
+          "Un identifiant existe pour un usage interne uniquement (ex. code-barres stock).",
+          "Un QR code ou identifiant est testé sur une gamme limitée.",
+          "Un QR code est utilisé sur une partie significative des références.",
+          "Un QR code ou identifiant équivalent est utilisé systématiquement sur les produits."]},
+        { q:"Les systèmes actuels permettraient-ils d'exporter des données dans un format structuré ?", opts:[
+          "Aucune donnée n'est exportable sans ressaisie manuelle complète.",
+          "Un export existe, mais dans un format peu exploitable (PDF, papier scanné).",
+          "Un export structuré existe pour une partie des données.",
+          "La majorité des données sont exportables dans un format structuré.",
+          "L'ensemble des données pertinentes est exportable dans un format structuré, sans ressaisie."]},
+        { q:"L'entreprise a-t-elle identifié un budget indicatif pour une éventuelle mise à niveau technologique ?", opts:[
+          "Aucune réflexion budgétaire n'a été engagée.",
+          "Le sujet a été mentionné sans chiffrage.",
+          "Un ordre de grandeur informel existe, non validé.",
+          "Un budget indicatif a été estimé pour une éventuelle mise à niveau.",
+          "Un budget a été validé et rattaché à un calendrier de mise en œuvre."]},
+        { q:"Un responsable informatique est-il associé aux réflexions sur le sujet DPP ?", opts:[
+          "Aucune personne IT n'est associée au sujet.",
+          "L'IT est informée après coup, sans association aux décisions.",
+          "L'IT est consultée ponctuellement, sans rôle défini.",
+          "L'IT participe régulièrement aux discussions sur le sujet.",
+          "L'IT est pleinement associée à la démarche, avec un rôle clair."]}
+      ],
+      matrix:{
+        nonengage:{ action:"Faire l'état des lieux de l'existant. Ne rien acheter dans l'immédiat.",
+          court:{ objectif:"Lister les outils déjà utilisés (Excel, ERP, logiciel de stocks) et ce qu'ils permettent réellement d'exporter aujourd'hui.", echeance:"D'ici 3 semaines" },
+          moyen:{ objectif:"Structurer un tableur unique couvrant vos références prioritaires, sans achat logiciel.", echeance:"D'ici 6 mois" } },
+        emergent:{ action:"Évaluer la capacité d'export structuré du système actuel.",
+          court:{ objectif:"Tester l'export de données produit depuis votre ERP actuel, si vous en avez un, dans un format structuré.", echeance:"D'ici 1 mois" },
+          moyen:{ objectif:"Standardiser cet export pour couvrir la majorité de vos références.", echeance:"D'ici 6 mois" } },
+        structure:{ action:"Rédiger un cahier des charges pour une éventuelle mise à niveau.",
+          court:{ objectif:"Rédiger un cahier des charges PIM : besoins, volumes, budget indicatif (repère : 2 000 à 5 000 MAD/mois en SaaS).", echeance:"D'ici 2 mois" },
+          moyen:{ objectif:"Sélectionner un prestataire après avoir vérifié la conformité EN 18216-18223 et l'exportabilité de vos données.", echeance:"D'ici 9 mois" } },
+        maitrise:{ action:"Préparer l'interopérabilité avec les normes harmonisées EN 18216 à 18223.",
+          court:{ objectif:"Demander à votre prestataire ou éditeur une preuve écrite de conformité aux normes EN 18216 à 18223.", echeance:"D'ici 2 mois" },
+          moyen:{ objectif:"Valoriser cette conformité auprès de vos donneurs d'ordre comme argument commercial.", echeance:"D'ici 12 mois" } }
+      }},
+
+    { key:"competences", name:"Compétences",
+      intro:"Ce que vos équipes savent déjà, et comment cette connaissance circule (chapitres 1 à 3, 18).",
+      questions:[
+        { q:"Au moins une personne dans l'entreprise connaît-elle les grandes lignes du règlement ESPR ?", opts:[
+          "Personne n'a entendu parler de l'ESPR ou du DPP.",
+          "Le sujet a été vaguement mentionné par un client, sans être creusé.",
+          "Une personne a lu quelques informations générales sur le sujet.",
+          "Une personne connaît les grandes lignes du calendrier et des obligations.",
+          "Plusieurs personnes maîtrisent le sujet et savent ce qui concerne réellement l'entreprise."]},
+        { q:"Une sensibilisation a-t-elle déjà été organisée en interne sur ce sujet ?", opts:[
+          "Non, jamais ; ce n'est pas un sujet connu en interne.",
+          "Le sujet a été mentionné oralement, sans support ni suivi.",
+          "Une information ponctuelle a circulé (email, réunion), sans formation.",
+          "Une session de sensibilisation a eu lieu pour une partie des équipes.",
+          "Une formation a été organisée, avec des participants de plusieurs fonctions."]},
+        { q:"L'entreprise a-t-elle participé à des formations proposées par l'AMITH, le CTTH ou GTEX ?", opts:[
+          "L'entreprise n'a participé à aucune formation ou atelier sur le sujet.",
+          "L'entreprise a entendu parler de ces formations, sans y participer.",
+          "Une participation ponctuelle a eu lieu, sans suite.",
+          "L'entreprise participe occasionnellement à ces formations.",
+          "L'entreprise participe régulièrement aux formations et ateliers sectoriels."]},
+        { q:"Les équipes de production connaissent-elles l'importance des données qu'elles peuvent fournir ?", opts:[
+          "Les équipes de production ignorent totalement le sujet.",
+          "Quelques responsables en ont entendu parler, pas les équipes.",
+          "Une partie des équipes a été informée, sans lien direct avec leur travail quotidien.",
+          "Les équipes de production comprennent globalement pourquoi ces données comptent.",
+          "Les équipes de production savent précisément quelles données elles doivent fournir, et pourquoi."]},
+        { q:"L'entreprise dispose-t-elle d'une personne capable de dialoguer techniquement avec un donneur d'ordre sur ce sujet ?", opts:[
+          "Personne ne serait en mesure de répondre à une demande DPP d'un client.",
+          "Une personne pourrait répondre, mais de façon très limitée.",
+          "Une personne peut échanger sur les bases, sans expertise approfondie.",
+          "Une personne dialogue déjà avec certains clients sur ces sujets.",
+          "Une ou plusieurs personnes dialoguent régulièrement et techniquement avec les donneurs d'ordre."]},
+        { q:"Une veille réglementaire, même informelle, est-elle assurée sur l'évolution du dossier DPP ?", opts:[
+          "Aucune veille n'est assurée sur l'évolution du dossier DPP.",
+          "La veille dépend du hasard des informations reçues des clients.",
+          "Une veille informelle et irrégulière existe.",
+          "Une veille régulière, même informelle, est assurée par une personne identifiée.",
+          "Une veille structurée est assurée et partagée avec les fonctions concernées."]},
+        { q:"L'entreprise a-t-elle prévu de participer à un atelier de sensibilisation sectoriel ?", opts:[
+          "Aucune participation n'est prévue ni envisagée.",
+          "Le sujet a été évoqué sans engagement.",
+          "Une participation est envisagée sans être planifiée.",
+          "Une participation est planifiée pour les prochains mois.",
+          "L'entreprise participe déjà activement aux initiatives sectorielles (AMITH, CTTH, GTEX)."]},
+        { q:"Un plan de montée en compétence est-il envisagé pour les mois à venir ?", opts:[
+          "Aucun plan n'est envisagé.",
+          "Le sujet a été mentionné sans intention concrète.",
+          "Une intention existe, sans plan formalisé.",
+          "Un plan de montée en compétence est envisagé pour les prochains mois.",
+          "Un plan de montée en compétence est défini et engagé, avec des actions concrètes."]}
+      ],
+      matrix:{
+        nonengage:{ action:"Organiser une sensibilisation interne courte pour les fonctions clés.",
+          court:{ objectif:"Organiser une session d'une à deux heures avec qualité, production et achats sur les grandes lignes de l'ESPR.", echeance:"D'ici 1 mois" },
+          moyen:{ objectif:"Étendre cette sensibilisation aux équipes de production sur le terrain.", echeance:"D'ici 6 mois" } },
+        emergent:{ action:"Participer aux formations proposées par l'AMITH, le CTTH ou GTEX.",
+          court:{ objectif:"Identifier et inscrire une personne à la prochaine formation AMITH, CTTH ou GTEX/MENATEX.", echeance:"D'ici 2 mois" },
+          moyen:{ objectif:"Faire de cette participation une pratique régulière pour le référent.", echeance:"D'ici 12 mois" } },
+        structure:{ action:"Former le référent DPP aux spécifications techniques du JRC.",
+          court:{ objectif:"Approfondir la connaissance du référent sur les points de données du JRC et les niveaux modèle/lot/article.", echeance:"D'ici 3 mois" },
+          moyen:{ objectif:"Positionner le référent comme interlocuteur technique reconnu face aux équipes conformité des clients.", echeance:"D'ici 9 mois" } },
+        maitrise:{ action:"Entretenir un dialogue technique régulier avec les donneurs d'ordre.",
+          court:{ objectif:"Préparer une présentation courte de votre niveau de préparation DPP pour vos principaux clients.", echeance:"D'ici 2 mois" },
+          moyen:{ objectif:"Utiliser cette maturité comme argument commercial dans vos négociations annuelles.", echeance:"D'ici 12 mois" } }
+      }},
+
+    { key:"conformite", name:"Conformité",
+      intro:"Vos certificats, audits et fiches de sécurité, et leur capacité à être mobilisés rapidement (chapitres 5, 8, 17).",
+      questions:[
+        { q:"L'entreprise connaît-elle les certifications déjà détenues par ses fournisseurs de matière ?", opts:[
+          "Les certifications des fournisseurs ne sont ni connues ni demandées.",
+          "Certaines certifications sont mentionnées oralement, sans preuve.",
+          "Les certifications sont connues pour certains fournisseurs seulement.",
+          "Les certifications sont connues pour la majorité des fournisseurs de matière.",
+          "Les certifications de tous les fournisseurs de matière sont connues et documentées."]},
+        { q:"Ces certifications sont-elles centralisées et à jour ?", opts:[
+          "Aucune centralisation ; les documents sont dispersés ou perdus.",
+          "Une tentative de classement existe, non maintenue à jour.",
+          "Une partie des certifications est centralisée.",
+          "La majorité des certifications sont centralisées et suivies.",
+          "L'ensemble des certifications est centralisé, avec suivi des dates de validité."]},
+        { q:"L'entreprise a-t-elle déjà réalisé des audits sociaux avec ses donneurs d'ordre ?", opts:[
+          "Aucun audit social n'a jamais été réalisé.",
+          "Un audit a eu lieu une fois, il y a longtemps.",
+          "Des audits ont lieu occasionnellement, à la demande ponctuelle d'un client.",
+          "Des audits sociaux sont réalisés régulièrement avec plusieurs donneurs d'ordre.",
+          "Des audits sociaux réguliers sont réalisés et anticipés, indépendamment des demandes clients."]},
+        { q:"Les résultats de ces audits sont-ils conservés dans un format réutilisable ?", opts:[
+          "Les résultats d'audits ne sont pas conservés de façon exploitable.",
+          "Les rapports existent sur papier, non centralisés.",
+          "Les rapports sont conservés, mais dans des formats hétérogènes.",
+          "Les rapports sont conservés de façon centralisée et consultable.",
+          "Les résultats sont conservés dans un format structuré, prêt à être réutilisé pour le DPP."]},
+        { q:"L'entreprise suit-elle les évolutions de la réglementation REACH applicable aux substances chimiques ?", opts:[
+          "La réglementation REACH n'est ni connue ni suivie.",
+          "REACH est vaguement connu, sans suivi actif.",
+          "Un suivi existe pour certaines substances seulement.",
+          "Un suivi régulier de REACH est assuré pour les principales substances utilisées.",
+          "Un suivi structuré de REACH est assuré et documenté pour l'ensemble des substances concernées."]},
+        { q:"Les fiches de données de sécurité des produits chimiques utilisés sont-elles disponibles ?", opts:[
+          "Aucune fiche de sécurité n'est suivie ou demandée.",
+          "Certaines fiches existent, dispersées ou obsolètes.",
+          "Les fiches existent pour les produits principaux, pas pour tous.",
+          "Les fiches sont disponibles pour la majorité des produits chimiques utilisés.",
+          "Toutes les fiches de sécurité sont disponibles, classées et à jour."]},
+        { q:"L'entreprise a-t-elle une visibilité sur les exigences spécifiques de chacun de ses donneurs d'ordre ?", opts:[
+          "Les exigences de chaque client ne sont pas suivies formellement.",
+          "Les exigences sont connues de mémoire, sans document de référence.",
+          "Certaines exigences clients sont documentées, pas toutes.",
+          "Les exigences des principaux clients sont documentées et suivies.",
+          "Les exigences de chaque donneur d'ordre sont documentées et régulièrement mises à jour."]},
+        { q:"Un dispositif de mise à jour continue de la conformité est-il envisagé ?", opts:[
+          "Aucun dispositif n'est envisagé ; la conformité est traitée au cas par cas.",
+          "Le sujet a été mentionné, sans intention concrète.",
+          "Une intention existe, sans dispositif défini.",
+          "Un dispositif est envisagé, sans être encore opérationnel.",
+          "Un dispositif de mise à jour continue est en place et suivi."]}
+      ],
+      matrix:{
+        nonengage:{ action:"Recenser les certifications déjà existantes. Ne rien jeter.",
+          court:{ objectif:"Rassembler tous les certificats déjà existants, même anciens ou incomplets, dans un seul dossier (GOTS, GRS, OCS, OEKO-TEX, ISO...).", echeance:"D'ici 3 semaines" },
+          moyen:{ objectif:"Identifier les certificats manquants pour vos principales références et matières.", echeance:"D'ici 6 mois" } },
+        emergent:{ action:"Centraliser les certificats et vérifier leur validité.",
+          court:{ objectif:"Vérifier, pour chaque certificat, sa date de validité et son rattachement à un lot précis.", echeance:"D'ici 1 mois" },
+          moyen:{ objectif:"Mettre en place un classement centralisé et à jour de l'ensemble des certificats.", echeance:"D'ici 6 mois" } },
+        structure:{ action:"Anticiper le choix entre certification tierce et auto-déclaration.",
+          court:{ objectif:"Identifier, donnée par donnée, si une certification tierce ou une auto-déclaration est la voie la plus adaptée.", echeance:"D'ici 2 mois" },
+          moyen:{ objectif:"Documenter formellement ce choix pour chaque catégorie de donnée concernée.", echeance:"D'ici 9 mois" } },
+        maitrise:{ action:"Mettre en place un dispositif de mise à jour continue avec alertes.",
+          court:{ objectif:"Mettre en place un rappel automatique avant chaque date d'expiration de certificat.", echeance:"D'ici 1 mois" },
+          moyen:{ objectif:"Étendre ce dispositif de suivi sur les dix années de conservation exigées par le règlement.", echeance:"En continu" } }
+      }},
+
+    { key:"fournisseurs", name:"Fournisseurs & sous-traitance",
+      intro:"Ce que vous savez de votre chaîne amont et de vos ateliers sous-traitants (chapitres 5, 6, 15).",
+      questions:[
+        { q:"L'entreprise dispose-t-elle d'une liste à jour de tous ses sous-traitants ?", opts:[
+          "Aucune liste formelle des sous-traitants n'existe.",
+          "Une liste existe, mais elle est ancienne ou incomplète.",
+          "Une liste existe pour les sous-traitants principaux seulement.",
+          "Une liste à jour existe pour la majorité des sous-traitants.",
+          "Une liste à jour et complète existe, avec coordonnées et prestations réalisées."]},
+        { q:"Des exigences de transmission de données figurent-elles dans les contrats fournisseurs ?", opts:[
+          "Aucun contrat n'aborde la transmission de données.",
+          "Le sujet est parfois évoqué à l'oral, jamais par écrit.",
+          "Une clause générique existe, sans détail sur les données à transmettre.",
+          "Certains contrats précisent les modalités de transmission des données.",
+          "Les contrats précisent clairement quelles données transmettre, comment et à quelle fréquence."]},
+        { q:"Les ateliers de teinture ou d'ennoblissement sous-traités sont-ils audités ?", opts:[
+          "Aucun audit n'est réalisé chez ces sous-traitants.",
+          "Un audit a eu lieu une fois, sans suivi.",
+          "Certains ateliers sont audités, pas tous.",
+          "La majorité des ateliers de teinture ou d'ennoblissement sous-traités sont audités.",
+          "Tous les ateliers sous-traités critiques sont audités régulièrement."]},
+        { q:"L'origine des matières fournies sous régime ATPA fait-elle l'objet d'une demande explicite au donneur d'ordre ?", opts:[
+          "L'origine des matières fournies n'est jamais demandée au donneur d'ordre.",
+          "La question est posée oralement, sans suivi ni réponse formalisée.",
+          "L'origine est demandée pour certaines commandes seulement.",
+          "L'origine est demandée systématiquement pour les nouvelles références.",
+          "L'origine des matières est demandée et documentée systématiquement auprès du donneur d'ordre."]},
+        { q:"Un protocole de transmission de données est-il envisagé avec les principaux fournisseurs ?", opts:[
+          "Aucun protocole n'est envisagé.",
+          "Le sujet a été mentionné, sans proposition concrète.",
+          "Une réflexion est engagée avec un ou deux fournisseurs.",
+          "Un protocole est envisagé avec les principaux fournisseurs.",
+          "Un protocole formalisé existe avec les fournisseurs et sous-traitants clés."]},
+        { q:"Les sous-traitants sont-ils informés des enjeux du DPP par l'entreprise donneuse d'ordre locale ?", opts:[
+          "Les sous-traitants n'ont jamais été informés du sujet.",
+          "Le sujet a été mentionné informellement à un ou deux sous-traitants.",
+          "Certains sous-traitants ont été informés, pas tous.",
+          "La majorité des sous-traitants critiques ont été sensibilisés.",
+          "Tous les sous-traitants concernés ont été informés et sensibilisés au sujet."]},
+        { q:"L'entreprise a-t-elle évalué le risque de dépendance à des fournisseurs peu coopératifs sur ce sujet ?", opts:[
+          "Ce risque n'a jamais été évalué.",
+          "Le risque a été évoqué informellement, sans analyse.",
+          "Une évaluation partielle existe, sur quelques fournisseurs critiques.",
+          "Le risque est évalué pour la majorité des fournisseurs stratégiques.",
+          "Le risque est évalué systématiquement et intégré aux décisions d'achat."]},
+        { q:"Existe-t-il une clause de révision des contrats fournisseurs en cas d'évolution réglementaire ?", opts:[
+          "Aucun contrat ne prévoit de clause de révision réglementaire.",
+          "Le sujet n'a jamais été discuté avec les fournisseurs ou clients.",
+          "Une clause générique existe dans certains contrats, sans lien direct avec le DPP.",
+          "Une clause de révision liée à la réglementation existe dans certains contrats récents.",
+          "Une clause de révision réglementaire est systématiquement intégrée aux nouveaux contrats."]}
+      ],
+      matrix:{
+        nonengage:{ action:"Établir la liste complète de vos sous-traitants.",
+          court:{ objectif:"Dresser la liste complète de vos sous-traitants : tissage, teinture, broderie, lavage, impression.", echeance:"D'ici 1 mois" },
+          moyen:{ objectif:"Compléter cette liste avec les coordonnées et la nature exacte de chaque prestation.", echeance:"D'ici 6 mois" } },
+        emergent:{ action:"Introduire une clause de transmission de données dans les contrats.",
+          court:{ objectif:"Rédiger un modèle de clause de transmission de données à intégrer dans vos prochains contrats.", echeance:"D'ici 2 mois" },
+          moyen:{ objectif:"Intégrer cette clause en priorité chez vos fournisseurs de matière sous régime ATPA.", echeance:"D'ici 9 mois" } },
+        structure:{ action:"Auditer en priorité les sous-traitants de teinture et d'ennoblissement.",
+          court:{ objectif:"Planifier un audit des ateliers de teinture ou d'ennoblissement sous-traités les plus critiques.", echeance:"D'ici 3 mois" },
+          moyen:{ objectif:"Généraliser cet audit à l'ensemble de vos sous-traitants de teinture et d'ennoblissement.", echeance:"D'ici 12 mois" } },
+        maitrise:{ action:"Formaliser un protocole précisant format et fréquence de transmission.",
+          court:{ objectif:"Rédiger un protocole type précisant format, fréquence et interlocuteur pour la transmission de données.", echeance:"D'ici 2 mois" },
+          moyen:{ objectif:"Déployer ce protocole auprès de l'ensemble de vos fournisseurs et sous-traitants stratégiques.", echeance:"D'ici 12 mois" } }
+      }}
+  ];
+
+  /* ============ STATE ============ */
+
+  var state = { screen:"home", profile:null, dimIndex:0, answers:{}, showPlan:false };
+
+  var app = document.getElementById("app");
+  var stitchWrap = document.getElementById("stitchWrap");
+  var stitchFill = document.getElementById("stitchFill");
+  var stitchNeedle = document.getElementById("stitchNeedle");
+  var stitchLeft = document.getElementById("stitchLeft");
+  var stitchRight = document.getElementById("stitchRight");
+  var modeLabel = document.getElementById("modeLabel");
+
+  function setProgress(pct, leftText, rightText){
+    stitchWrap.hidden = false;
+    stitchFill.style.width = pct + "%";
+    stitchNeedle.style.left = pct + "%";
+    stitchLeft.textContent = leftText;
+    stitchRight.textContent = rightText;
+  }
+  function hideProgress(){ stitchWrap.hidden = true; }
+  function el(html){ var d = document.createElement("div"); d.innerHTML = html.trim(); return d.firstElementChild; }
+  function totalDiagQuestions(){ return DIMENSIONS.reduce(function(a,d){return a+d.questions.length;},0); }
+  function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+
+  /* ============ RENDER: HOME ============ */
+
+  function renderHome(){
+    modeLabel.textContent = "Accueil";
+    hideProgress();
+    var frag = el(
+      '<div>'+
+        '<div class="hero">'+
+          '<h1>Où en est votre entreprise face au DPP&nbsp;?</h1>'+
+          '<p class="lede">Un diagnostic complet, en 6 dimensions et 48 questions, pour situer précisément la préparation de votre entreprise face au futur passeport digital des produits — et identifier vos priorités concrètes, chapitre par chapitre.</p>'+
+          '<div class="source"><span class="dot"></span>Contenu basé sur le Guide opérationnel DPP Textile Maroc — SIPPO / AMITH / Swisscontact</div>'+
+          '<div class="meta"><span><b>48</b> questions</span><span><b>~15</b> min</span><span><b>6</b> dimensions</span></div>'+
+          '<p class="scope">Ouvert à toutes les entreprises marocaines du textile et de l\'habillement — de la filature à la confection, en sous-traitance comme sous marque propre.</p>'+
+        '</div>'+
+        '<div class="onboard">'+
+          '<h4>Pour commencer</h4>'+
+          '<div class="sub">Quel est votre positionnement principal dans la chaîne&nbsp;? Cela permet d\'adapter la lecture de votre résultat, sans changer les questions posées.</div>'+
+          '<div class="profile-grid" id="profileGrid"></div>'+
+        '</div>'+
+        '<div class="start-row">'+
+          '<button class="btn accent" id="startDiag" disabled>Commencer le diagnostic →</button>'+
+          '<span class="start-hint" id="startHint">Choisissez d\'abord votre positionnement ci-dessus.</span>'+
+        '</div>'+
+        '<p class="about-note">Cet outil est une auto-évaluation pédagogique, calquée sur le questionnaire de maturité du Guide opérationnel DPP (Partie V, Outil 1). Il ne remplace pas une analyse juridique et ne constitue pas un dépôt officiel de données DPP.</p>'+
+      '</div>'
+    );
+    app.innerHTML = "";
+    app.appendChild(frag);
+
+    var grid = document.getElementById("profileGrid");
+    PROFILES.forEach(function(p){
+      var b = el('<button class="profile-opt'+(state.profile===p.key?' active':'')+'">'+
+        '<span class="dotmark"></span>'+
+        '<span class="ptext"><b>'+p.label+'</b><span>'+p.sub+'</span></span></button>');
+      b.addEventListener("click", function(){ state.profile = p.key; renderHome(); });
+      grid.appendChild(b);
+    });
+
+    var startBtn = document.getElementById("startDiag");
+    var hint = document.getElementById("startHint");
+    if(state.profile){ startBtn.disabled = false; hint.textContent = ""; }
+    startBtn.addEventListener("click", function(){
+      state.screen="diag"; state.dimIndex=0; state.answers={}; state.showPlan=false; render();
+    });
+  }
+
+  /* ============ RENDER: DIAGNOSTIC ============ */
+
+  function renderDiag(){
+    modeLabel.textContent = "Diagnostic";
+    var dim = DIMENSIONS[state.dimIndex];
+    var answeredHere = dim.questions.every(function(_,i){ return state.answers[dim.key+"_"+i] != null; });
+
+    var qsBefore = 0;
+    for(var i=0;i<state.dimIndex;i++) qsBefore += DIMENSIONS[i].questions.length;
+    var answeredNow = dim.questions.filter(function(_,i){return state.answers[dim.key+"_"+i]!=null;}).length;
+    var pct = Math.round(((qsBefore+answeredNow) / totalDiagQuestions()) * 100);
+    setProgress(pct, "Dimension "+(state.dimIndex+1)+" / "+DIMENSIONS.length+" — "+(qsBefore+answeredNow)+"/"+totalDiagQuestions()+" questions", dim.name);
+
+    var qHtml = dim.questions.map(function(item, qi){
+      var qk = dim.key+"_"+qi;
+      var current = state.answers[qk];
+      var optsHtml = item.opts.map(function(optText, oi){
+        var val = oi+1;
+        var sel = current===val ? " sel" : "";
+        return '<button data-qk="'+qk+'" data-n="'+val+'" class="'+sel.trim()+'">'+
+               '<span class="num">'+val+'</span><span>'+esc(optText)+'</span></button>';
+      }).join("");
+      return '<div class="qblock">'+
+             '<h2><span class="qnum">'+(qi+1)+'.</span>'+esc(item.q)+'</h2>'+
+             '<div class="scale-opt">'+optsHtml+'</div></div>';
+    }).join("");
+
+    var frag = el(
+      '<div>'+
+      '<div class="qcard">'+
+        '<div class="dim-label">Dimension '+(state.dimIndex+1)+' / '+DIMENSIONS.length+' — '+dim.name+'</div>'+
+        '<div class="dim-intro">'+dim.intro+'</div>'+
+        qHtml+
+      '</div>'+
+      '<div class="nav-row">'+
+        '<button class="btn ghost" id="diagBack">'+(state.dimIndex===0?'← Accueil':'← Précédent')+'</button>'+
+        '<span class="nav-hint">'+dim.questions.filter(function(_,i){return state.answers[dim.key+"_"+i]!=null;}).length+' / '+dim.questions.length+' répondues</span>'+
+        '<button class="btn accent" id="diagNext" '+(answeredHere?'':'disabled')+'>'+(state.dimIndex===DIMENSIONS.length-1?'Voir mon résultat →':'Suivant →')+'</button>'+
+      '</div>'+
+      '</div>'
+    );
+    app.innerHTML = "";
+    app.appendChild(frag);
+
+    app.querySelectorAll(".scale-opt button").forEach(function(b){
+      b.addEventListener("click", function(){
+        state.answers[b.getAttribute("data-qk")] = parseInt(b.getAttribute("data-n"),10);
+        renderDiag();
+      });
+    });
+    document.getElementById("diagBack").addEventListener("click", function(){
+      if(state.dimIndex===0){ state.screen="home"; render(); }
+      else { state.dimIndex--; render(); }
+    });
+    document.getElementById("diagNext").addEventListener("click", function(){
+      if(state.dimIndex < DIMENSIONS.length-1){ state.dimIndex++; render(); }
+      else { state.screen="diagResult"; render(); }
+    });
+  }
+
+  function renderDiagResult(){
+    modeLabel.textContent = "Résultat";
+    hideProgress();
+
+    var dimScores = DIMENSIONS.map(function(d){
+      var vals = d.questions.map(function(_,i){ return state.answers[d.key+"_"+i] || 0; });
+      var avg = vals.reduce(function(a,b){return a+b;},0) / vals.length;
+      var band = bandFor(avg);
+      return { key:d.key, name:d.name, avg:avg, band:band, m:d.matrix[band.mkey] };
+    });
+    var overall = dimScores.reduce(function(a,d){return a+d.avg;},0) / dimScores.length;
+    var band = bandFor(overall);
+    var ranked = dimScores.slice().sort(function(a,b){return a.avg-b.avg;});
+    var priorityKeys = ranked.slice(0,2).map(function(d){return d.key;});
+
+    var barsHtml = dimScores.map(function(d){
+      var pct = (d.avg/5*100).toFixed(0);
+      return '<div class="bar-row">'+
+        '<div class="name">'+d.name+'</div>'+
+        '<div class="bar-track"><div class="bar-fill '+d.band.key+'" style="width:'+pct+'%"></div></div>'+
+        '<div class="val">'+d.avg.toFixed(1)+'</div></div>';
+    }).join("");
+
+    var matrixHtml = dimScores.map(function(d){
+      var isPriority = priorityKeys.indexOf(d.key) !== -1;
+      return '<div class="matrix-item'+(isPriority?' priority':'')+'">'+
+        '<div class="mrow"><span class="mname">'+d.name+(isPriority?' — priorité':'')+'</span><span class="mscore">'+d.avg.toFixed(1)+'/5, '+d.band.name+'</span></div>'+
+        '<p class="maction">'+d.m.action+'</p>'+
+        '<div class="term-grid">'+
+          '<div class="term-block"><span class="tlabel">Court terme</span><p>'+d.m.court.objectif+'</p><span class="techeance">'+d.m.court.echeance+'</span></div>'+
+          '<div class="term-block"><span class="tlabel">Moyen terme</span><p>'+d.m.moyen.objectif+'</p><span class="techeance">'+d.m.moyen.echeance+'</span></div>'+
+        '</div>'+
+      '</div>';
+    }).join("");
+
+    var profileHtml = "";
+    if(state.profile){
+      var p = PROFILES.filter(function(x){return x.key===state.profile;})[0];
+      if(p) profileHtml = '<div class="profile-note"><b>Votre positionnement — '+p.label+'</b>'+p.note+'</div>';
+    }
+
+    var planSectionHtml = state.showPlan
+      ? '<hr class="section-divider">'+
+        '<h3 style="font-size:16px;">Votre plan d\'action personnalisé</h3>'+
+        '<p style="font-size:12.5px;color:var(--ink-soft);margin-top:6px;">Pour chaque dimension, un objectif à court terme (0-3 mois) et à moyen terme (3-12 mois), avec échéance, calculés à partir de votre niveau atteint.</p>'+
+        '<div class="matrix-list">'+matrixHtml+'</div>'
+      : '<div class="plan-cta">'+
+          '<div class="pc-text"><b>Votre plan d\'action n\'est pas encore généré</b><span>Objectifs court terme et moyen terme, avec échéances, pour chacune de vos 6 dimensions.</span></div>'+
+          '<button class="btn accent" id="genPlan">Générer mon plan d\'action →</button>'+
+        '</div>';
+
+    var frag = el(
+      '<div>'+
+      '<div class="result-head">'+
+        '<div class="kicker">Diagnostic de maturité DPP</div>'+
+        '<div class="score-row">'+
+          '<div class="score-big">'+overall.toFixed(1)+'<span style="font-size:22px;color:var(--ink-soft);">/5</span></div>'+
+          '<div class="band-pill '+band.key+'">'+band.name+'</div>'+
+        '</div>'+
+        '<p class="band-note">'+band.note+'</p>'+
+      '</div>'+
+      '<div class="bars">'+barsHtml+'</div>'+
+      profileHtml+
+      planSectionHtml+
+      '<div class="footer-nav">'+
+        '<button class="btn ghost" id="retakeDiag">↺ Refaire le diagnostic</button>'+
+        '<button class="btn ghost" id="toHome">← Accueil</button>'+
+      '</div>'+
+      '</div>'
+    );
+    app.innerHTML = "";
+    app.appendChild(frag);
+
+    var genBtn = document.getElementById("genPlan");
+    if(genBtn) genBtn.addEventListener("click", function(){ state.showPlan = true; renderDiagResult(); window.scrollTo(0,0); });
+    document.getElementById("retakeDiag").addEventListener("click", function(){ state.dimIndex=0; state.answers={}; state.showPlan=false; state.screen="diag"; render(); });
+    document.getElementById("toHome").addEventListener("click", function(){ state.showPlan=false; state.screen="home"; render(); });
+  }
+
+  /* ============ ROUTER ============ */
+
+  function render(){
+    window.scrollTo(0,0);
+    if(state.screen==="home") renderHome();
+    else if(state.screen==="diag") renderDiag();
+    else if(state.screen==="diagResult") renderDiagResult();
+  }
+
+  document.getElementById("brandHome").addEventListener("click", function(){ state.screen="home"; render(); });
+
+  render();
+})();
+</script>
