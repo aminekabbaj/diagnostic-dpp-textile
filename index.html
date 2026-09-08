@@ -680,7 +680,24 @@
 
   /* ============ STATE ============ */
 
-  var state = { screen:"home", profile:null, companyName:"", dimIndex:0, answers:{}, showPlan:false };
+  var state = { screen:"home", profile:null, companyName:"", dimIndex:0, answers:{}, showPlan:false, submitted:false };
+
+  /* URL du Google Apps Script Web App qui journalise chaque diagnostic dans un Google Sheet.
+     Voir les instructions de déploiement fournies séparément. Laisser vide désactive l'envoi
+     sans jamais bloquer l'expérience de l'entreprise qui répond au diagnostic. */
+  var SHEET_ENDPOINT = "";
+
+  function submitResultToSheet(payload){
+    if(!SHEET_ENDPOINT) return;
+    try{
+      fetch(SHEET_ENDPOINT, {
+        method:"POST",
+        mode:"no-cors",
+        headers:{ "Content-Type":"text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+    }catch(e){ /* ne jamais bloquer l'utilisateur si l'envoi échoue */ }
+  }
 
   var app = document.getElementById("app");
   var stitchWrap = document.getElementById("stitchWrap");
@@ -751,7 +768,7 @@
     var hint = document.getElementById("startHint");
     if(state.profile){ startBtn.disabled = false; hint.textContent = ""; }
     startBtn.addEventListener("click", function(){
-      state.screen="diag"; state.dimIndex=0; state.answers={}; state.showPlan=false; render();
+      state.screen="diag"; state.dimIndex=0; state.answers={}; state.showPlan=false; state.submitted=false; render();
     });
   }
 
@@ -830,6 +847,24 @@
     var ranked = dimScores.slice().sort(function(a,b){return a.avg-b.avg;});
     var priorityKeys = ranked.slice(0,2).map(function(d){return d.key;});
 
+    if(!state.submitted){
+      state.submitted = true;
+      var profileForLog = PROFILES.filter(function(x){return x.key===state.profile;})[0];
+      var byKey = {}; dimScores.forEach(function(d){ byKey[d.key] = d.avg.toFixed(1); });
+      submitResultToSheet({
+        entreprise: state.companyName || "",
+        positionnement: profileForLog ? profileForLog.label : "",
+        scoreGlobal: overall.toFixed(1),
+        bande: band.name,
+        gouvernance: byKey.gouvernance,
+        donnees: byKey.donnees,
+        systemes: byKey.systemes,
+        competences: byKey.competences,
+        conformite: byKey.conformite,
+        fournisseurs: byKey.fournisseurs
+      });
+    }
+
     var barsHtml = dimScores.map(function(d){
       var pct = (d.avg/5*100).toFixed(0);
       return '<div class="bar-row">'+
@@ -906,7 +941,7 @@
 
     var genBtn = document.getElementById("genPlan");
     if(genBtn) genBtn.addEventListener("click", function(){ state.showPlan = true; renderDiagResult(); window.scrollTo(0,0); });
-    document.getElementById("retakeDiag").addEventListener("click", function(){ state.dimIndex=0; state.answers={}; state.showPlan=false; state.screen="diag"; render(); });
+    document.getElementById("retakeDiag").addEventListener("click", function(){ state.dimIndex=0; state.answers={}; state.showPlan=false; state.submitted=false; state.screen="diag"; render(); });
     document.getElementById("toHome").addEventListener("click", function(){ state.showPlan=false; state.screen="home"; render(); });
   }
 
