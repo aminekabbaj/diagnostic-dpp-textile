@@ -1,0 +1,434 @@
+<title>Calculateur Coûts DPP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12253C; --ink-soft:#3E5064; --paper:#F5F4EF; --panel:#FFFFFF; --panel-2:#EEEDE5;
+    --line:#D9D7CC; --line-strong:#B9C1BC; --accent:#146B52; --accent-ink:#FFFFFF; --accent-soft:#35B584;
+    --accent-wash:#E4F0EA; --danger:#B8452E; --danger-wash:#F6E4DE; --warn:#B4790E; --warn-wash:#F7ECD8;
+    --mid:#2C8C6E; --mid-wash:#E1F1EA; --good:#146B52; --good-wash:#E4F0EA; --focus:#2B6CB0;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#EDEFEE; --ink-soft:#AEB9C4; --paper:#0F1B2A; --panel:#16283C; --panel-2:#1C3247;
+      --line:#2A4359; --line-strong:#3B5A73; --accent:#3FBB92; --accent-ink:#08201A; --accent-soft:#3FBB92;
+      --accent-wash:#173328; --danger:#E38468; --danger-wash:#3A241E; --warn:#E4B65B; --warn-wash:#3A2E14;
+      --mid:#5FCBA6; --mid-wash:#153B2E; --good:#3FBB92; --good-wash:#173328; --focus:#7CB2E8;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#EDEFEE; --ink-soft:#AEB9C4; --paper:#0F1B2A; --panel:#16283C; --panel-2:#1C3247;
+    --line:#2A4359; --line-strong:#3B5A73; --accent:#3FBB92; --accent-ink:#08201A; --accent-soft:#3FBB92;
+    --accent-wash:#173328; --danger:#E38468; --danger-wash:#3A241E; --warn:#E4B65B; --warn-wash:#3A2E14;
+    --mid:#5FCBA6; --mid-wash:#153B2E; --good:#3FBB92; --good-wash:#173328; --focus:#7CB2E8;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{ background:var(--paper); color:var(--ink); font-family:"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; font-size:15.5px; line-height:1.55; -webkit-font-smoothing:antialiased; }
+  ::selection{ background:var(--accent-soft); color:var(--accent-ink); }
+  h1,h2,h3{ font-family:"Archivo", ui-sans-serif, system-ui, sans-serif; text-wrap:balance; margin:0; }
+  .mono{ font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  button{ font-family:inherit; }
+  a{ color:var(--accent); }
+  :focus-visible{ outline:2px solid var(--focus); outline-offset:2px; }
+
+  #app{ max-width:820px; margin:0 auto; padding:0 20px 90px; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:22px 20px 16px; max-width:820px; margin:0 auto; gap:16px; }
+  .brand{ display:flex; align-items:center; gap:10px; cursor:pointer; background:none; border:none; padding:0; color:inherit; text-decoration:none; }
+  .brand-mark{ width:30px; height:30px; border-radius:4px; background:var(--ink); color:var(--paper); display:flex; align-items:center; justify-content:center; font-family:"Archivo"; font-weight:800; font-size:11px; letter-spacing:-.02em; flex:none; }
+  .brand-text{ display:flex; flex-direction:column; line-height:1.15; text-align:left; }
+  .brand-text b{ font-family:"Archivo"; font-weight:700; font-size:14.5px; }
+  .brand-text span{ font-size:11px; color:var(--ink-soft); letter-spacing:.03em; }
+  .eyebrow{ font-size:11px; font-weight:600; letter-spacing:.10em; text-transform:uppercase; color:var(--ink-soft); }
+  .nav-link{ font-size:12px; color:var(--ink-soft); text-decoration:none; border:1px solid var(--line); padding:6px 12px; }
+  .nav-link:hover{ border-color:var(--line-strong); color:var(--ink); }
+
+  .hero{ padding:8px 0 6px; }
+  .hero h1{ font-size:30px; font-weight:800; letter-spacing:-.01em; }
+  .hero p.lede{ margin:14px 0 0; max-width:62ch; color:var(--ink-soft); font-size:15.5px; }
+  .hero .source{ margin-top:16px; display:inline-flex; align-items:center; gap:8px; font-size:12px; color:var(--ink-soft); border:1px solid var(--line); padding:6px 10px 6px 8px; }
+  .hero .source .dot{ width:6px; height:6px; background:var(--accent); flex:none; }
+
+  .section{ margin-top:32px; border-top:1px solid var(--line); padding-top:22px; }
+  .section h4{ font-family:"Archivo"; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); margin-bottom:4px; }
+  .section .sub{ font-size:12.5px; color:var(--ink-soft); margin-bottom:16px; max-width:64ch; }
+
+  .field-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:560px){ .field-grid{ grid-template-columns:1fr; } }
+  .field{ display:flex; flex-direction:column; gap:6px; }
+  .field label{ font-size:12.5px; font-weight:600; color:var(--ink); }
+  .field .hint{ font-size:11px; color:var(--ink-soft); }
+  .field input[type="number"], .field input[type="text"], .field select{
+    width:100%; border:1px solid var(--line); background:var(--panel); color:var(--ink);
+    padding:10px 12px; font-family:"IBM Plex Mono"; font-size:14px;
+  }
+  .field select{ font-family:"IBM Plex Sans"; font-size:13.5px; }
+  .field input:focus, .field select:focus{ outline:2px solid var(--focus); outline-offset:-1px; border-color:transparent; }
+
+  .radio-row{ display:flex; flex-direction:column; gap:8px; }
+  .radio-opt{ display:flex; gap:10px; align-items:flex-start; border:1px solid var(--line); background:var(--panel); padding:11px 13px; cursor:pointer; }
+  .radio-opt:hover{ border-color:var(--line-strong); }
+  .radio-opt.sel{ border-color:var(--accent); background:var(--accent-wash); }
+  .radio-opt .dotmark{ flex:none; width:15px; height:15px; border-radius:50%; border:1px solid var(--line-strong); margin-top:2px; position:relative; }
+  .radio-opt.sel .dotmark{ border-color:var(--accent); }
+  .radio-opt.sel .dotmark::after{ content:""; position:absolute; inset:3px; border-radius:50%; background:var(--accent); }
+  .radio-opt .rtext b{ display:block; font-size:13.5px; font-weight:600; }
+  .radio-opt .rtext span{ display:block; font-size:12px; color:var(--ink-soft); margin-top:2px; }
+
+  .toggle-row{ display:flex; gap:8px; }
+  .toggle-btn{ flex:1; border:1px solid var(--line); background:var(--panel); padding:10px; text-align:center; cursor:pointer; font-size:13px; color:var(--ink); }
+  .toggle-btn.sel{ border-color:var(--accent); background:var(--accent-wash); color:var(--accent); font-weight:600; }
+
+  .checkline{ display:flex; gap:10px; align-items:flex-start; border:1px solid var(--line); background:var(--panel); padding:12px 14px; cursor:pointer; }
+  .checkline input{ margin-top:3px; flex:none; }
+  .checkline .ctext b{ display:block; font-size:13px; font-weight:600; }
+  .checkline .ctext span{ display:block; font-size:11.5px; color:var(--ink-soft); margin-top:2px; }
+
+  .btn{ font-family:"Archivo"; font-weight:700; font-size:13.5px; letter-spacing:.01em; border:1px solid var(--ink); background:var(--ink); color:var(--paper); padding:13px 24px; cursor:pointer; }
+  .btn:hover{ opacity:.88; }
+  .btn.ghost{ background:transparent; color:var(--ink); }
+  .btn.ghost:hover{ background:var(--panel-2); }
+  .btn.accent{ background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  .calc-row{ margin-top:34px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+
+  /* ---------- results ---------- */
+  .result-head{ padding:10px 0 0; }
+  .result-head .kicker{ font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); }
+  .totals-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:18px; }
+  @media (max-width:560px){ .totals-grid{ grid-template-columns:1fr; } }
+  .total-card{ background:var(--panel); border:1px solid var(--line); padding:20px; }
+  .total-card .tlabel{ font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
+  .total-card .tval{ font-family:"IBM Plex Mono"; font-weight:700; font-size:24px; color:var(--ink); }
+  .total-card .tpct{ font-size:12px; color:var(--ink-soft); margin-top:6px; }
+  .total-card.dark{ background:var(--ink); border-color:var(--ink); }
+  .total-card.dark .tlabel{ color:var(--accent-soft); }
+  .total-card.dark .tval{ color:var(--paper); }
+  .total-card.dark .tpct{ color:#9FB4C8; }
+
+  .breakdown{ margin-top:30px; display:flex; flex-direction:column; gap:0; }
+  .bd-row{ display:grid; grid-template-columns:1fr 200px; gap:16px; padding:14px 0; border-bottom:1px solid var(--line); align-items:center; }
+  @media (max-width:560px){ .bd-row{ grid-template-columns:1fr; gap:6px; } }
+  .bd-row .bd-name{ font-size:13.5px; font-weight:600; color:var(--ink); }
+  .bd-row .bd-note{ font-size:11.5px; color:var(--ink-soft); margin-top:3px; }
+  .bd-row .bd-vals{ text-align:right; }
+  @media (max-width:560px){ .bd-row .bd-vals{ text-align:left; } }
+  .bd-row .bd-val{ font-family:"IBM Plex Mono"; font-size:13.5px; font-weight:600; color:var(--ink); }
+  .bd-row .bd-sub{ font-size:10.5px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em; }
+  .bd-track{ height:6px; background:var(--panel-2); margin-top:6px; }
+  .bd-fill{ height:100%; background:var(--accent); }
+
+  .note-box{ margin-top:26px; padding:16px 18px; background:var(--accent-wash); border:1px solid var(--accent); color:var(--ink); font-size:13px; }
+  .note-box b{ display:block; font-family:"Archivo"; font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin-bottom:6px; }
+  .note-box.warn{ background:var(--warn-wash); border-color:var(--warn); }
+  .note-box.warn b{ color:var(--warn); }
+
+  .disclaimer{ font-size:11.5px; color:var(--ink-soft); margin-top:34px; padding-top:16px; border-top:1px solid var(--line); line-height:1.6; }
+
+  .print-header{ display:none; }
+  .download-row{ margin-top:28px; }
+  [hidden]{ display:none !important; }
+
+  @media print{
+    .topbar, .nav-link, .download-row, .calc-row, form#calcForm, .disclaimer{ display:none !important; }
+    * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+    body{ background:#fff; font-size:12px; }
+    #app{ max-width:100%; padding:0; }
+    .print-header{ display:block; margin-bottom:18px; padding-bottom:14px; border-bottom:2px solid var(--ink); }
+    .print-header .ptitle{ font-family:"Archivo"; font-weight:800; font-size:20px; }
+    .print-header .pmeta{ margin-top:6px; font-size:11px; color:var(--ink-soft); }
+    .bd-row, .total-card{ break-inside:avoid; }
+  }
+</style>
+
+<div class="topbar">
+  <a class="brand" href="./" aria-label="Retour au diagnostic">
+    <span class="brand-mark">DPP</span>
+    <span class="brand-text"><b>Calculateur Coûts DPP</b><span>SIPPO Maroc · AMITH · Swisscontact</span></span>
+  </a>
+  <a class="nav-link" href="./">← Diagnostic de maturité</a>
+</div>
+
+<div id="app"></div>
+
+<script>
+(function(){
+
+  var NAVY = "14304F";
+
+  var state = {
+    regime: "faconpure",
+    effectif: 40,
+    references: 5,
+    pieces: 150000,
+    caExport: 8000000,
+    fournisseurs: 0,
+    soustraitants: 0,
+    controleQualite: false,
+    systeme: "auto",
+    connecteERP: false,
+    accompagnement: false,
+    partClient: "",
+    computed: false
+  };
+
+  var REGIMES = [
+    { key:"faconpure", label:"Façon / CMT — la matière vous est fournie", sub:"Sous-traitance, ATPA sans paiement. Pas de négociation fournisseur directe." },
+    { key:"cotraitance", label:"Co-traitance", sub:"ATPA avec paiement. Vous achetez tout ou partie des intrants." },
+    { key:"integre", label:"Marque propre / entreprise intégrée", sub:"Vous achetez vos matières et pilotez plusieurs étapes ou votre propre marque." }
+  ];
+
+  var app = document.getElementById("app");
+  function el(html){ var d = document.createElement("div"); d.innerHTML = html.trim(); return d.firstElementChild; }
+  function fmt(n){ return Math.round(n).toLocaleString("fr-FR").replace(/ /g," "); }
+  function clamp0(n){ return n < 0 ? 0 : n; }
+
+  /* ============ COST MODEL ============
+     Calibré sur les 3 profils illustratifs du Guide opérationnel DPP, Chapitre 13
+     "Combien coûte la préparation au DPP" — formules généralisées pour s'adapter
+     aux paramètres réels de chaque entreprise plutôt qu'à un profil fixe. */
+
+  function tempsInterneJours(effectif){
+    if(effectif <= 50) return 2;
+    if(effectif <= 150) return 5;
+    if(effectif <= 300) return 10;
+    return 20;
+  }
+  function tauxJournalierDefault(regime){
+    if(regime === "faconpure") return 900;
+    if(regime === "cotraitance") return 950;
+    return 1050;
+  }
+  function tarifQR(pieces){
+    if(pieces <= 300000) return [0.10,0.20];
+    if(pieces <= 1500000) return [0.10,0.15];
+    return [0.08,0.12];
+  }
+  function suggestSysteme(references, effectif){
+    if(references <= 15) return "tableur";
+    if(references <= 50 && effectif <= 300) return "pim";
+    return "pimerp";
+  }
+
+  function computeLines(s){
+    var jours = tempsInterneJours(s.effectif);
+    var taux = tauxJournalierDefault(s.regime);
+    var referentAn1 = [jours*12*taux*0.9, jours*12*taux*1.15];
+    var referentRecur = [referentAn1[0]*0.7, referentAn1[1]*0.7];
+
+    var cartoAn1 = s.references > 10 ? [s.references*400, s.references*600] : [0,0];
+    var cartoNote = s.references > 10
+      ? (s.effectif > 150 ? "Souvent déjà inclus dans le temps interne pour une grande équipe projet — ne comptez pas les deux." : "Cartographie sur " + s.references + " références.")
+      : "Inclus dans le temps interne (portefeuille limité).";
+
+    var couverture = s.controleQualite ? 0.45 : 0;
+    var essaisAn1 = [s.references*3*300*(1-couverture), s.references*3*600*(1-couverture)];
+    var essaisRecur = essaisAn1.slice();
+
+    var fournAn1 = s.regime === "faconpure" ? [0,0] : [s.fournisseurs*1250, s.fournisseurs*2000];
+    var auditAn1 = [s.soustraitants*1500, s.soustraitants*3000];
+
+    var qrTarif = tarifQR(s.pieces);
+    var qrAn1 = [s.pieces*qrTarif[0], s.pieces*qrTarif[1]];
+    var qrRecur = qrAn1.slice();
+
+    var systeme = s.systeme === "auto" ? suggestSysteme(s.references, s.effectif) : s.systeme;
+    var sysAn1, sysRecur, sysNote;
+    if(systeme === "tableur"){
+      sysAn1 = [0,0]; sysRecur = [0,0]; sysNote = "Tableur structuré — aucun coût logiciel.";
+    } else {
+      var monthly = s.references > 50 ? [5000,10000] : [2000,5000];
+      var integ = (s.connecteERP && s.references > 50) ? [30000,50000] : [0,0];
+      sysAn1 = [monthly[0]*12+integ[0], monthly[1]*12+integ[1]];
+      sysRecur = [monthly[0]*12, monthly[1]*12];
+      sysNote = (s.references > 50 ? "PIM SaaS, 5 000 à 10 000 MAD/mois" : "PIM SaaS, 2 000 à 5 000 MAD/mois") + (integ[1]>0 ? " + intégration ERP (ponctuel)" : ".");
+    }
+
+    var formTier = s.effectif<=50 ? [1000,2000] : s.effectif<=150 ? [5000,12000] : s.effectif<=300 ? [10000,20000] : [15000,30000];
+    var formAn1 = formTier;
+    var formRecur = [formTier[0]*0.75, formTier[1]*0.75];
+
+    var accompAn1 = s.accompagnement ? [50000,100000] : [0,0];
+
+    var lines = [
+      { key:"referent", name:"Temps interne (référent DPP + contributions ponctuelles)", an1:referentAn1, recur:referentRecur,
+        note: jours+" jours/mois valorisés à "+fmt(taux)+" MAD/jour (coût employeur), à ajuster à votre réalité." },
+      { key:"carto", name:"Cartographie des données", an1:cartoAn1, recur:[0,0], note:cartoNote, recurNote:"Ponctuel, non récurrent." },
+      { key:"essais", name:"Essais de robustesse en laboratoire", an1:essaisAn1, recur:essaisRecur,
+        note: s.references+" référence(s) × 3 essais × 300-600 MAD"+(couverture>0?" (45% déjà couverts par votre contrôle qualité)":"")+"." },
+      { key:"fourn", name:"Certificats et négociation fournisseurs", an1:fournAn1, recur:fournAn1,
+        note: s.regime==="faconpure" ? "Sans objet : la matière est fournie par le donneur d'ordre." : s.fournisseurs+" fournisseur(s) de matière." },
+      { key:"audit", name:"Audit des sous-traitants (teinture, ennoblissement...)", an1:auditAn1, recur:auditAn1,
+        note: s.soustraitants>0 ? s.soustraitants+" atelier(s) sous-traitant(s) à auditer." : "Aucun sous-traitant déclaré." },
+      { key:"qr", name:"Identifiant physique (QR code) par pièce", an1:qrAn1, recur:qrRecur,
+        note: fmt(s.pieces)+" pièces/an × "+qrTarif[0].toFixed(2)+" à "+qrTarif[1].toFixed(2)+" MAD/pièce." },
+      { key:"systeme", name:"Système d'information", an1:sysAn1, recur:sysRecur, note:sysNote },
+      { key:"formation", name:"Formation et sensibilisation", an1:formAn1, recur:formRecur, note:"Selon la taille de l'équipe à former." },
+      { key:"accomp", name:"Accompagnement externe ponctuel (facultatif)", an1:accompAn1, recur:[0,0], note: s.accompagnement ? "Conseil pour la structuration initiale." : "Non retenu.", recurNote:"Ponctuel, non récurrent." }
+    ];
+    return lines;
+  }
+
+  /* ============ RENDER ============ */
+
+  function render(){
+    var frag = el(
+      '<div>'+
+        '<div class="hero">'+
+          '<h1>Combien coûte votre préparation au DPP&nbsp;?</h1>'+
+          '<p class="lede">Un calculateur pour estimer, poste par poste, le coût de première année et le coût récurrent annuel de la préparation au passeport digital des produits — à partir des paramètres réels de votre entreprise.</p>'+
+          '<div class="source"><span class="dot"></span>Méthodologie et tarifs de référence : Guide opérationnel DPP — Chapitre 13, « Combien coûte la préparation au DPP »</div>'+
+        '</div>'+
+        '<form id="calcForm">'+renderForm()+'</form>'+
+        '<div class="calc-row">'+
+          '<button class="btn accent" id="computeBtn">Calculer l\'estimation →</button>'+
+          '<span style="font-size:12px;color:var(--ink-soft);">Toutes les valeurs sont modifiables ci-dessus.</span>'+
+        '</div>'+
+        '<div id="resultZone"></div>'+
+        '<p class="disclaimer"><b>Avertissement méthodologique.</b> Ces estimations sont strictement indicatives, construites par généralisation des trois profils illustratifs du guide (PME sous-traitance, co-traitance, grande entreprise). Elles ne constituent ni un devis ni un engagement. L\'acte délégué textile n\'étant pas publié, le périmètre exact des données exigibles reste susceptible d\'évoluer. Ajustez chaque hypothèse à votre situation réelle.</p>'+
+      '</div>'
+    );
+    app.innerHTML = "";
+    app.appendChild(frag);
+    bindForm();
+    document.getElementById("computeBtn").addEventListener("click", function(e){
+      e.preventDefault();
+      state.computed = true;
+      renderResults();
+      document.getElementById("resultZone").scrollIntoView({behavior:"smooth", block:"start"});
+    });
+    if(state.computed) renderResults();
+  }
+
+  function renderForm(){
+    var regimeHtml = REGIMES.map(function(r){
+      return '<label class="radio-opt'+(state.regime===r.key?' sel':'')+'" data-regime="'+r.key+'">'+
+        '<span class="dotmark"></span><span class="rtext"><b>'+r.label+'</b><span>'+r.sub+'</span></span></label>';
+    }).join("");
+
+    return (
+      '<div class="section" style="margin-top:26px;border-top:none;padding-top:0;">'+
+        '<h4>Votre régime</h4>'+
+        '<div class="sub">Détermine si la négociation fournisseur matière s\'applique.</div>'+
+        '<div class="radio-row">'+regimeHtml+'</div>'+
+      '</div>'+
+      '<div class="section">'+
+        '<h4>Taille et volumes</h4>'+
+        '<div class="sub">Ces paramètres pilotent la majorité des postes de coût.</div>'+
+        '<div class="field-grid">'+
+          '<div class="field"><label>Effectif (nombre de salariés)</label><input type="number" id="f_effectif" min="1" value="'+state.effectif+'"></div>'+
+          '<div class="field"><label>Références exportées vers l\'UE</label><input type="number" id="f_references" min="0" value="'+state.references+'"></div>'+
+          '<div class="field"><label>Pièces exportées par an</label><input type="number" id="f_pieces" min="0" step="1000" value="'+state.pieces+'"></div>'+
+          '<div class="field"><label>Chiffre d\'affaires export annuel (MAD)</label><input type="number" id="f_ca" min="0" step="10000" value="'+state.caExport+'"></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="section">'+
+        '<h4>Chaîne d\'approvisionnement</h4>'+
+        '<div class="sub">Sans objet pour la façon pure si la matière est fournie par le donneur d\'ordre.</div>'+
+        '<div class="field-grid">'+
+          '<div class="field"><label>Fournisseurs de matière à certifier</label><input type="number" id="f_fournisseurs" min="0" value="'+state.fournisseurs+'"><span class="hint">0 si la matière vous est fournie</span></div>'+
+          '<div class="field"><label>Sous-traitants à auditer (teinture, broderie...)</label><input type="number" id="f_soustraitants" min="0" value="'+state.soustraitants+'"></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="section">'+
+        '<h4>Système d\'information cible</h4>'+
+        '<div class="sub">« Auto » applique la recommandation du guide selon votre taille (chapitre 11).</div>'+
+        '<div class="radio-row" id="sysRow">'+
+          radioSys("auto","Recommandation automatique","Basée sur votre nombre de références et votre effectif.")+
+          radioSys("tableur","Tableur structuré","Aucun coût logiciel — point de départ pour toute PME.")+
+          radioSys("pim","PIM en mode SaaS","2 000 à 10 000 MAD/mois selon le volume de références.")+
+        '</div>'+
+        '<label class="checkline" style="margin-top:10px;" id="erpLine"><input type="checkbox" id="f_erp" '+(state.connecteERP?'checked':'')+'><span class="ctext"><b>Connecter le PIM à mon ERP existant</b><span>Ajoute un coût d\'intégration ponctuel de 30 000 à 50 000 MAD (pertinent au-delà de 50 références).</span></span></label>'+
+      '</div>'+
+      '<div class="section">'+
+        '<h4>Hypothèses complémentaires</h4>'+
+        '<label class="checkline"><input type="checkbox" id="f_cq" '+(state.controleQualite?'checked':'')+'><span class="ctext"><b>Nous disposons déjà d\'un contrôle qualité formalisé</b><span>Réduit d\'environ 45% le coût des essais de robustesse déjà couverts en interne.</span></span></label>'+
+        '<label class="checkline" style="margin-top:10px;"><input type="checkbox" id="f_accomp" '+(state.accompagnement?'checked':'')+'><span class="ctext"><b>Prévoir un accompagnement externe ponctuel (conseil)</b><span>Facultatif, plutôt pertinent au-delà de 300 salariés — 50 000 à 100 000 MAD.</span></span></label>'+
+        '<div class="field" style="margin-top:14px;max-width:340px;"><label>Part de votre CA export représentée par votre principal donneur d\'ordre (%, facultatif)</label><input type="number" id="f_partclient" min="0" max="100" placeholder="Ex. 15" value="'+state.partClient+'"><span class="hint">Permet de chiffrer le coût de l\'inaction en cas de perte de ce client.</span></div>'+
+      '</div>'
+    );
+  }
+  function radioSys(key,label,sub){
+    return '<label class="radio-opt'+(state.systeme===key?' sel':'')+'" data-sys="'+key+'"><span class="dotmark"></span><span class="rtext"><b>'+label+'</b><span>'+sub+'</span></span></label>';
+  }
+
+  function bindForm(){
+    document.querySelectorAll('[data-regime]').forEach(function(b){
+      b.addEventListener("click", function(){ state.regime = b.getAttribute("data-regime"); render(); });
+    });
+    document.querySelectorAll('[data-sys]').forEach(function(b){
+      b.addEventListener("click", function(){ state.systeme = b.getAttribute("data-sys"); render(); });
+    });
+    ["f_effectif","f_references","f_pieces","f_ca","f_fournisseurs","f_soustraitants","f_partclient"].forEach(function(id){
+      var elx = document.getElementById(id);
+      if(elx) elx.addEventListener("input", function(){
+        var map = {f_effectif:"effectif",f_references:"references",f_pieces:"pieces",f_ca:"caExport",f_fournisseurs:"fournisseurs",f_soustraitants:"soustraitants",f_partclient:"partClient"};
+        state[map[id]] = elx.value === "" ? "" : parseFloat(elx.value);
+      });
+    });
+    var erp = document.getElementById("f_erp"); if(erp) erp.addEventListener("change", function(){ state.connecteERP = erp.checked; });
+    var cq = document.getElementById("f_cq"); if(cq) cq.addEventListener("change", function(){ state.controleQualite = cq.checked; });
+    var ac = document.getElementById("f_accomp"); if(ac) ac.addEventListener("change", function(){ state.accompagnement = ac.checked; });
+  }
+
+  function renderResults(){
+    var s = {
+      regime: state.regime, effectif: state.effectif||1, references: state.references||0,
+      pieces: state.pieces||0, caExport: state.caExport||0, fournisseurs: state.fournisseurs||0,
+      soustraitants: state.soustraitants||0, controleQualite: state.controleQualite,
+      systeme: state.systeme, connecteERP: state.connecteERP, accompagnement: state.accompagnement
+    };
+    var lines = computeLines(s);
+    var totalAn1 = [0,0], totalRecur = [0,0];
+    lines.forEach(function(l){ totalAn1[0]+=l.an1[0]; totalAn1[1]+=l.an1[1]; totalRecur[0]+=l.recur[0]; totalRecur[1]+=l.recur[1]; });
+
+    var maxVal = Math.max.apply(null, lines.map(function(l){ return Math.max(l.an1[1], l.recur[1]); }).concat([1]));
+
+    var pctAn1 = s.caExport>0 ? [totalAn1[0]/s.caExport*100, totalAn1[1]/s.caExport*100] : null;
+    var pctRecur = s.caExport>0 ? [totalRecur[0]/s.caExport*100, totalRecur[1]/s.caExport*100] : null;
+
+    var bdHtml = lines.map(function(l){
+      var pct1 = (l.an1[1]/maxVal*100).toFixed(0);
+      return '<div class="bd-row">'+
+        '<div><div class="bd-name">'+l.name+'</div><div class="bd-note">'+l.note+'</div></div>'+
+        '<div class="bd-vals"><div class="bd-sub">1ʳᵉ année</div><div class="bd-val">'+fmt(l.an1[0])+' – '+fmt(l.an1[1])+' MAD</div>'+
+          '<div class="bd-track"><div class="bd-fill" style="width:'+pct1+'%"></div></div></div>'+
+      '</div>';
+    }).join("");
+
+    var todayStr = new Date().toLocaleDateString("fr-FR", { day:"numeric", month:"long", year:"numeric" });
+    var printHeader = '<div class="print-header"><div class="ptitle">Estimation des coûts de préparation au DPP</div>'+
+      '<div class="pmeta">Calculé le '+todayStr+' · Basé sur le Guide opérationnel DPP, Chapitre 13 — SIPPO / AMITH / Swisscontact</div></div>';
+
+    var inactionHtml = "";
+    if(state.partClient && s.caExport>0){
+      var perte = s.caExport * (state.partClient/100);
+      var multLow = totalRecur[1]>0 ? perte/totalRecur[1] : 0;
+      var multHigh = totalRecur[0]>0 ? perte/totalRecur[0] : 0;
+      inactionHtml = '<div class="note-box warn"><b>Coût de l\'inaction</b>Perdre ce donneur d\'ordre représenterait environ '+fmt(perte)+' MAD de chiffre d\'affaires — soit '+multLow.toFixed(0)+' à '+multHigh.toFixed(0)+' fois votre coût de préparation récurrent annuel.</div>';
+    } else {
+      inactionHtml = '<div class="note-box"><b>Repère du guide</b>Selon les trois profils illustratifs du Chapitre 13, la perte d\'un seul donneur d\'ordre représente en général 15 à 60 fois le coût annuel de préparation au DPP.</div>';
+    }
+
+    var html =
+      printHeader+
+      '<div class="result-head">'+
+        '<div class="kicker">Estimation personnalisée</div>'+
+      '</div>'+
+      '<div class="totals-grid">'+
+        '<div class="total-card"><div class="tlabel">Coût première année</div><div class="tval">'+fmt(totalAn1[0])+' – '+fmt(totalAn1[1])+' MAD</div>'+
+          (pctAn1?'<div class="tpct">'+pctAn1[0].toFixed(1)+' à '+pctAn1[1].toFixed(1)+'% du CA export</div>':'')+'</div>'+
+        '<div class="total-card dark"><div class="tlabel">Coût récurrent annuel (année 2+)</div><div class="tval">'+fmt(totalRecur[0])+' – '+fmt(totalRecur[1])+' MAD</div>'+
+          (pctRecur?'<div class="tpct">'+pctRecur[0].toFixed(1)+' à '+pctRecur[1].toFixed(1)+'% du CA export</div>':'')+'</div>'+
+      '</div>'+
+      '<div class="breakdown">'+bdHtml+'</div>'+
+      inactionHtml+
+      '<div class="download-row"><button class="btn accent" id="downloadPdf">⬇ Télécharger l\'estimation (PDF)</button></div>';
+
+    document.getElementById("resultZone").innerHTML = html;
+    document.getElementById("downloadPdf").addEventListener("click", function(){ window.print(); });
+  }
+
+  render();
+})();
+</script>

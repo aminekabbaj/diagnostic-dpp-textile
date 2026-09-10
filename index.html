@@ -63,6 +63,9 @@
   .brand-text b{ font-family:"Archivo"; font-weight:700; font-size:14.5px; }
   .brand-text span{ font-size:11px; color:var(--ink-soft); letter-spacing:.03em; }
   .eyebrow{ font-size:11px; font-weight:600; letter-spacing:.10em; text-transform:uppercase; color:var(--ink-soft); text-align:right; }
+  .nav-link{ font-size:12px; color:var(--ink-soft); text-decoration:none; border:1px solid var(--line); padding:6px 12px; white-space:nowrap; }
+  .nav-link:hover{ border-color:var(--line-strong); color:var(--ink); }
+  .topbar-right{ display:flex; align-items:center; gap:14px; }
 
   .stitch-wrap{ max-width:760px; margin:0 auto; padding:0 20px; background:var(--paper); }
   .stitch-track{ position:relative; height:14px; width:100%;
@@ -216,7 +219,7 @@
     <span class="brand-mark">DPP</span>
     <span class="brand-text"><b>Diagnostic DPP Textile-Habillement</b><span>SIPPO Maroc · AMITH · Swisscontact</span></span>
   </button>
-  <span class="eyebrow" id="modeLabel">Accueil</span>
+  <span class="topbar-right"><a class="nav-link" href="./calculateur.html">Calculateur de coûts →</a><span class="eyebrow" id="modeLabel">Accueil</span></span>
 </div>
 
 <div class="stitch-wrap" id="stitchWrap" hidden>
