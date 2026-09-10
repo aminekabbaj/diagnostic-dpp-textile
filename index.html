@@ -242,8 +242,8 @@
       sub:"Vous appliquez couleur, apprêts ou traitements chimiques sur fil ou tissu.",
       note:"Vos données environnementales et chimiques sont particulièrement scrutées (chapitres 6 et 7) : fonctionnement réel de la station de traitement des effluents, fiches de données de sécurité produit par produit. Comme les autres façonniers, vous n'êtes pas responsable du dépôt du DPP, mais vos données conditionnent celui de vos clients." },
     { key:"soustraitance", label:"Confection / façon — la matière vous est fournie",
-      sub:"Sous-traitance, admission temporaire sans paiement (ATPA). Vous coupez, montez, finissez ; le tissu appartient au donneur d'ordre jusqu'à la réexportation. En 2025, ce segment représente 76% de la confection marocaine.",
-      note:"Le DPP est une fiche produit numérique portée par la marque ou le donneur d'ordre qui met le vêtement sur le marché européen : il centralise des données d'identification, de composition et matières, d'origine et de traçabilité, d'entretien, de durabilité et de conformité — dont l'essentiel vient de l'amont, pas de vous. Si vous recevez tous les intrants et ne réalisez que la coupe et la couture, la donnée matière ne relève pas directement de votre périmètre : ce qui vous concerne, c'est votre capacité à produire et transmettre une donnée fiable sur votre propre étape." },
+      sub:"Sous-traitance, admission temporaire sans paiement (ATPA). Vous coupez, montez, finissez ; le tissu appartient au donneur d'ordre jusqu'à la réexportation.",
+      note:"Sous ce régime, la matière reste la propriété du donneur d'ordre jusqu'à la réexportation. Votre charge de données reste concentrée sur le site et les procédés : vous n'avez pas à déclarer l'origine ou la composition de l'étoffe. Priorité : une fiche site stable, rattachée à un identifiant unique et permanent." },
     { key:"cotraitance", label:"Confection en co-traitance",
       sub:"Admission temporaire avec paiement (ATPA). Vous achetez tout ou partie du tissu, des accessoires, ou des deux.",
       note:"Sous ce régime, vous achetez tout ou partie des intrants : vous devenez le seul acteur capable de documenter la chaîne amont des matières. Charge nettement supérieure. Priorité : sécuriser les certificats matière par lot, avant chaque commande, et non après." },
@@ -274,7 +274,7 @@
      de maturité) du Guide opérationnel DPP, avec des réponses réécrites en descriptions
      concrètes plutôt qu'une échelle abstraite. */
 
-  var DIMENSIONS_FULL = [
+  var DIMENSIONS = [
     { key:"gouvernance", name:"Gouvernance",
       intro:"Qui pilote le sujet, avec quel mandat, quel budget et quel suivi (chapitres 12-13).",
       questions:[
@@ -678,150 +678,9 @@
       }}
   ];
 
-  /* 12 questions, 3 dimensions x 4 — parcours express pour la confection en façon
-     (ATPA sans paiement). Ce segment représente 76% de la confection marocaine en 2025 ;
-     près de 70% de ces entreprises réalisent moins de 3 M$ de CA, avec un dirigeant
-     souvent seul aux commandes du sujet réglementaire, très sollicité et peu disponible
-     pour un questionnaire long. La donnée matière relevant de l'amont (donneur d'ordre),
-     ce parcours se recentre sur ce qui relève réellement du périmètre d'un façonnier pur :
-     équipement IT, système d'information, capacité à relier lot reçu → OF → expédition. */
-
-  var DIMENSIONS_SHORT = [
-    { key:"itequip", name:"Équipement IT",
-      intro:"Les moyens de base pour saisir et transmettre une donnée : poste, connexion, aisance des équipes.",
-      questions:[
-        { q:"Disposez-vous des moyens informatiques de base pour saisir et transmettre une donnée (poste, connexion internet) ?", opts:[
-          "Aucun poste informatique dédié ; tout se fait sur papier ou par téléphone.",
-          "Un poste existe mais la connexion est peu fiable ou partagée avec d'autres usages.",
-          "Un poste et une connexion fonctionnent, utilisés de façon ponctuelle pour la gestion.",
-          "Un poste et une connexion fiables sont disponibles et utilisés régulièrement.",
-          "Postes informatiques et connexion fiables, utilisés quotidiennement pour la gestion de production."]},
-        { q:"Si un client vous demande une donnée par email ou via un portail en ligne, pouvez-vous la lui transmettre rapidement ?", opts:[
-          "Impossible sans l'aide d'une personne extérieure à l'entreprise.",
-          "Possible, mais cela prend plusieurs jours et mobilise beaucoup de temps.",
-          "Possible en 3 à 5 jours, en réunissant l'information auprès de plusieurs personnes.",
-          "Possible en 1 à 2 jours, la plupart du temps par nous-mêmes.",
-          "Nous répondons en général en moins de 48h, par nous-mêmes, sans aide extérieure."]},
-        { q:"Une personne de l'entreprise est-elle à l'aise avec les outils numériques de base (email, tableur, partage de fichiers) ?", opts:[
-          "Personne dans l'entreprise n'est vraiment à l'aise avec ces outils.",
-          "Une seule personne s'en sert, de façon limitée et occasionnelle.",
-          "Une personne s'en sert régulièrement pour une partie de la gestion.",
-          "Plusieurs personnes utilisent ces outils, sans être toutes autonomes.",
-          "Plusieurs personnes utilisent ces outils couramment et de façon autonome."]},
-        { q:"Les fichiers et registres numériques de l'entreprise sont-ils sauvegardés régulièrement, pour ne pas être perdus en cas de panne ?", opts:[
-          "Aucune sauvegarde n'est faite ; tout est sur un seul poste ou support.",
-          "Une sauvegarde a été faite une fois, sans régularité.",
-          "Une sauvegarde ponctuelle existe, sans fréquence définie.",
-          "Une sauvegarde régulière existe, mais sur un seul support.",
-          "Une sauvegarde régulière existe, sur un support séparé ou en ligne."]}
-      ],
-      matrix:{
-        nonengage:{ action:"Équiper l'entreprise du strict minimum : un poste et une connexion fiables.",
-          court:{ objectif:"Identifier un poste informatique existant (même partagé) et vérifier la qualité de la connexion internet disponible.", echeance:"D'ici 2 semaines" },
-          moyen:{ objectif:"Former une personne à l'usage de base : email, fichiers, tableur.", echeance:"D'ici 3 mois" } },
-        emergent:{ action:"Fiabiliser l'usage quotidien des outils déjà présents.",
-          court:{ objectif:"Identifier qui, dans l'équipe, utilise déjà l'ordinateur, et centraliser cet usage autour de cette personne.", echeance:"D'ici 1 mois" },
-          moyen:{ objectif:"Mettre en place une sauvegarde régulière des fichiers, même simple (clé USB, email à soi-même, cloud gratuit).", echeance:"D'ici 6 mois" } },
-        structure:{ action:"Systématiser la transmission de données aux clients.",
-          court:{ objectif:"Définir un format et un canal standard pour répondre aux demandes de données (email avec pièce jointe type).", echeance:"D'ici 1 mois" },
-          moyen:{ objectif:"Réduire le délai de réponse à une demande de donnée à moins de 48 heures.", echeance:"D'ici 6 mois" } },
-        maitrise:{ action:"Maintenir la fiabilité et ne plus dépendre d'une seule personne.",
-          court:{ objectif:"Vérifier qu'au moins deux personnes savent répondre à une demande de données, pas une seule.", echeance:"D'ici 1 mois" },
-          moyen:{ objectif:"Préparer un modèle de réponse type pour anticiper les demandes futures des donneurs d'ordre.", echeance:"D'ici 12 mois" } }
-      }},
-
-    { key:"systemeinfo", name:"Système d'information",
-      intro:"Une gestion de production sur système (ERP / Excel structuré) plutôt que sur papier.",
-      questions:[
-        { q:"Votre gestion de production repose-t-elle sur un système (ERP, tableur structuré) ou sur du papier ?", opts:[
-          "Tout est géré sur papier ou dans des cahiers, sans aucun système.",
-          "Un tableur existe, mais peu utilisé ou mal tenu à jour.",
-          "Un tableur couvre une partie de la production, le reste reste sur papier.",
-          "Un tableur structuré ou un ERP couvre la majorité de la production.",
-          "Un ERP ou un tableur structuré couvre l'ensemble de la production, à jour."]},
-        { q:"Vos ordres de fabrication ont-ils une référence unique, enregistrée systématiquement ?", opts:[
-          "Aucun enregistrement structuré des ordres de fabrication.",
-          "Une référence existe parfois, de façon informelle et non systématique.",
-          "La plupart des ordres ont une référence, mais pas tous.",
-          "Chaque ordre de fabrication a une référence unique, enregistrée presque systématiquement.",
-          "Chaque ordre de fabrication a une référence unique enregistrée systématiquement, sans exception."]},
-        { q:"Pouvez-vous retrouver rapidement l'historique de production d'une commande passée (il y a 3, 6 ou 12 mois) ?", opts:[
-          "Impossible sans une recherche manuelle longue et incertaine.",
-          "Possible, mais cela demande plusieurs heures de recherche.",
-          "Possible en moins d'une heure, pour les commandes récentes seulement.",
-          "Possible en quelques minutes pour la plupart des commandes.",
-          "Retrouvable en quelques minutes, pour n'importe quelle commande, même ancienne."]},
-        { q:"Si vous deviez montrer votre registre de production à un client ou un auditeur, serait-il présentable tel quel ?", opts:[
-          "Non, le registre est trop désordonné pour être montré tel quel.",
-          "Il faudrait le réorganiser en profondeur avant de pouvoir le montrer.",
-          "Il faudrait quelques ajustements mineurs avant de le montrer.",
-          "Il est globalement présentable, avec de petites imperfections.",
-          "Oui, il est présentable tel quel, à tout moment."]}
-      ],
-      matrix:{
-        nonengage:{ action:"Passer du papier à un tableur structuré pour les ordres de fabrication.",
-          court:{ objectif:"Créer un tableur simple listant vos ordres de fabrication en cours, avec une référence unique par ordre.", echeance:"D'ici 1 mois" },
-          moyen:{ objectif:"Généraliser ce tableur à l'ensemble de la production, y compris l'historique récent.", echeance:"D'ici 6 mois" } },
-        emergent:{ action:"Fiabiliser l'enregistrement systématique des ordres de fabrication.",
-          court:{ objectif:"Vérifier que chaque nouvel ordre de fabrication reçoit bien une référence unique dès son ouverture.", echeance:"D'ici 1 mois" },
-          moyen:{ objectif:"Reconstituer l'historique des ordres de fabrication des 6 derniers mois dans le tableur.", echeance:"D'ici 6 mois" } },
-        structure:{ action:"Rendre l'historique de production rapidement consultable.",
-          court:{ objectif:"Organiser le classement, numérique ou papier, pour retrouver un ordre ancien en quelques minutes.", echeance:"D'ici 2 mois" },
-          moyen:{ objectif:"Tester la présentabilité du registre en le montrant à un tiers (comptable, client, auditeur).", echeance:"D'ici 6 mois" } },
-        maitrise:{ action:"Maintenir la rigueur du système sans changer d'outil sans raison.",
-          court:{ objectif:"Évaluer si le volume de production justifie un système plus structuré (ERP léger).", echeance:"D'ici 3 mois" },
-          moyen:{ objectif:"Conserver la discipline actuelle : un système n'a de valeur que s'il reste à jour.", echeance:"En continu" } }
-      }},
-
-    { key:"suivi", name:"Suivi de la donnée",
-      intro:"Relier un lot d'intrants reçu à l'ordre de fabrication, puis au produit fini expédié.",
-      questions:[
-        { q:"Lorsque vous recevez un lot de tissu ou d'intrants du donneur d'ordre, ce lot est-il identifié et enregistré à la réception ?", opts:[
-          "Non, les lots reçus ne sont pas identifiés individuellement à la réception.",
-          "Un enregistrement existe parfois, de façon informelle et incomplète.",
-          "La plupart des lots sont enregistrés, mais pas tous systématiquement.",
-          "Chaque lot reçu est identifié à la réception, avec quelques exceptions.",
-          "Chaque lot reçu est identifié et enregistré systématiquement à la réception."]},
-        { q:"Pouvez-vous relier un lot d'intrants reçu à l'ordre de fabrication qui l'a utilisé ?", opts:[
-          "Aucun lien n'est conservé entre le lot reçu et l'ordre de fabrication.",
-          "Le lien existe parfois dans la mémoire des équipes, jamais par écrit.",
-          "Le lien est noté pour certains ordres de fabrication seulement.",
-          "Le lien est noté pour la plupart des ordres de fabrication.",
-          "Chaque ordre de fabrication est systématiquement rattaché au(x) lot(s) d'intrants utilisés."]},
-        { q:"Pouvez-vous relier l'ordre de fabrication au produit fini expédié (quantités, dates, destination) ?", opts:[
-          "Aucun lien n'est conservé entre l'ordre de fabrication et l'expédition.",
-          "Le lien existe informellement, mais n'est jamais noté par écrit.",
-          "Le lien est noté pour certaines expéditions seulement.",
-          "Le lien est noté pour la plupart des expéditions.",
-          "Chaque expédition est reliée systématiquement à son ordre de fabrication d'origine."]},
-        { q:"Si votre client vous demandait demain de reconstituer le parcours complet d'une commande (lot reçu → production → expédition), pourriez-vous le faire ?", opts:[
-          "Impossible, les informations ne sont pas centralisées ni reliées entre elles.",
-          "Possible, mais avec beaucoup de recherches et d'incertitude sur le résultat.",
-          "Possible pour les commandes récentes, difficile pour les plus anciennes.",
-          "Possible pour la plupart des commandes, en quelques heures.",
-          "Oui, en quelques minutes, à partir de nos registres, pour n'importe quelle commande."]}
-      ],
-      matrix:{
-        nonengage:{ action:"Commencer à identifier chaque lot reçu dès son arrivée.",
-          court:{ objectif:"Attribuer un numéro ou une référence à chaque lot d'intrants reçu, dès la réception.", echeance:"D'ici 3 semaines" },
-          moyen:{ objectif:"Conserver ces références dans un registre simple, même papier au départ.", echeance:"D'ici 6 mois" } },
-        emergent:{ action:"Relier systématiquement le lot reçu à l'ordre de fabrication.",
-          court:{ objectif:"Noter, sur chaque ordre de fabrication, la référence du ou des lots d'intrants utilisés.", echeance:"D'ici 1 mois" },
-          moyen:{ objectif:"Généraliser cette pratique à tous les ordres de fabrication, sans exception.", echeance:"D'ici 6 mois" } },
-        structure:{ action:"Relier l'ordre de fabrication à l'expédition finale.",
-          court:{ objectif:"Ajouter sur chaque bon d'expédition la référence de l'ordre de fabrication correspondant.", echeance:"D'ici 1 mois" },
-          moyen:{ objectif:"Vérifier la fiabilité de ce lien sur un échantillon de commandes déjà expédiées.", echeance:"D'ici 6 mois" } },
-        maitrise:{ action:"Être capable de reconstituer le parcours complet sur simple demande.",
-          court:{ objectif:"Simuler une demande client : reconstituer le parcours d'une commande choisie au hasard, et mesurer le temps nécessaire.", echeance:"D'ici 1 mois" },
-          moyen:{ objectif:"Réduire ce temps de reconstitution à quelques minutes, de façon documentée et répétable.", echeance:"D'ici 12 mois" } }
-      }}
-  ];
-
   /* ============ STATE ============ */
 
-  var state = { screen:"home", profile:null, track:"full", companyName:"", dimIndex:0, answers:{}, showPlan:false, submitted:false };
-
-  function activeDims(){ return state.track === "short" ? DIMENSIONS_SHORT : DIMENSIONS_FULL; }
+  var state = { screen:"home", profile:null, companyName:"", dimIndex:0, answers:{}, showPlan:false, submitted:false };
 
   /* URL du Google Apps Script Web App qui journalise chaque diagnostic dans un Google Sheet.
      Voir les instructions de déploiement fournies séparément. Laisser vide désactive l'envoi
@@ -857,7 +716,7 @@
   }
   function hideProgress(){ stitchWrap.hidden = true; }
   function el(html){ var d = document.createElement("div"); d.innerHTML = html.trim(); return d.firstElementChild; }
-  function totalDiagQuestions(){ return activeDims().reduce(function(a,d){return a+d.questions.length;},0); }
+  function totalDiagQuestions(){ return DIMENSIONS.reduce(function(a,d){return a+d.questions.length;},0); }
   function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
 
   /* ============ RENDER: HOME ============ */
@@ -865,33 +724,13 @@
   function renderHome(){
     modeLabel.textContent = "Accueil";
     hideProgress();
-    var isFacon = state.profile === "soustraitance";
-
-    var startRowHtml;
-    if(!state.profile){
-      startRowHtml = '<div class="start-row">'+
-        '<button class="btn accent" id="startDiagFull" disabled>Commencer le diagnostic →</button>'+
-        '<span class="start-hint">Choisissez d\'abord votre positionnement ci-dessus.</span>'+
-      '</div>';
-    } else if(isFacon){
-      startRowHtml = '<div class="start-row">'+
-        '<button class="btn accent" id="startDiagShort">Commencer le diagnostic express (12 questions) →</button>'+
-      '</div>'+
-      '<div style="margin-top:10px;"><button class="btn ghost" id="startDiagFull" style="font-size:12px;padding:8px 14px;">Je préfère répondre au questionnaire complet (48 questions)</button></div>'+
-      '<p class="scope" style="margin-top:16px;">Ce segment représente 76% de la confection marocaine en 2025, et près de 70% de ces entreprises réalisent moins de 3&nbsp;M$ de chiffre d\'affaires — souvent avec un dirigeant seul aux commandes du sujet, très sollicité. Le diagnostic express se concentre sur ce qui relève réellement de votre périmètre : équipement IT, système d\'information, suivi de la donnée.</p>';
-    } else {
-      startRowHtml = '<div class="start-row">'+
-        '<button class="btn accent" id="startDiagFull">Commencer le diagnostic →</button>'+
-      '</div>';
-    }
-
     var frag = el(
       '<div>'+
         '<div class="hero">'+
           '<h1>Où en est votre entreprise face au DPP&nbsp;?</h1>'+
-          '<p class="lede">Un diagnostic pour situer précisément la préparation de votre entreprise face au futur passeport digital des produits, et identifier vos priorités concrètes, chapitre par chapitre. Un parcours express de 12 questions est proposé pour la confection en façon (ATPA sans paiement).</p>'+
+          '<p class="lede">Un diagnostic complet, en 6 dimensions et 48 questions, pour situer précisément la préparation de votre entreprise face au futur passeport digital des produits — et identifier vos priorités concrètes, chapitre par chapitre.</p>'+
           '<div class="source"><span class="dot"></span>Contenu basé sur le Guide opérationnel DPP Textile Maroc — SIPPO / AMITH / Swisscontact</div>'+
-          '<div class="meta"><span><b>12 ou 48</b> questions</span><span><b>~5-15</b> min</span></div>'+
+          '<div class="meta"><span><b>48</b> questions</span><span><b>~15</b> min</span><span><b>6</b> dimensions</span></div>'+
           '<p class="scope">Ouvert à toutes les entreprises marocaines du textile et de l\'habillement — de la filature à la confection, en sous-traitance comme sous marque propre.</p>'+
         '</div>'+
         '<div class="onboard">'+
@@ -901,10 +740,13 @@
         '</div>'+
         '<div class="onboard">'+
           '<h4>Pour commencer</h4>'+
-          '<div class="sub">Quel est votre positionnement principal dans la chaîne&nbsp;? Cela permet d\'adapter la lecture de votre résultat.</div>'+
+          '<div class="sub">Quel est votre positionnement principal dans la chaîne&nbsp;? Cela permet d\'adapter la lecture de votre résultat, sans changer les questions posées.</div>'+
           '<div class="profile-grid" id="profileGrid"></div>'+
         '</div>'+
-        startRowHtml+
+        '<div class="start-row">'+
+          '<button class="btn accent" id="startDiag" disabled>Commencer le diagnostic →</button>'+
+          '<span class="start-hint" id="startHint">Choisissez d\'abord votre positionnement ci-dessus.</span>'+
+        '</div>'+
         '<p class="about-note">Cet outil est une auto-évaluation pédagogique, calquée sur le questionnaire de maturité du Guide opérationnel DPP (Partie V, Outil 1). Il ne remplace pas une analyse juridique et ne constitue pas un dépôt officiel de données DPP.</p>'+
       '</div>'
     );
@@ -922,28 +764,26 @@
       grid.appendChild(b);
     });
 
-    function goDiag(track){
-      state.track = track; state.screen="diag"; state.dimIndex=0; state.answers={}; state.showPlan=false; state.submitted=false; render();
-    }
-    var shortBtn = document.getElementById("startDiagShort");
-    if(shortBtn) shortBtn.addEventListener("click", function(){ goDiag("short"); });
-    var fullBtn = document.getElementById("startDiagFull");
-    if(fullBtn && !fullBtn.disabled) fullBtn.addEventListener("click", function(){ goDiag("full"); });
+    var startBtn = document.getElementById("startDiag");
+    var hint = document.getElementById("startHint");
+    if(state.profile){ startBtn.disabled = false; hint.textContent = ""; }
+    startBtn.addEventListener("click", function(){
+      state.screen="diag"; state.dimIndex=0; state.answers={}; state.showPlan=false; state.submitted=false; render();
+    });
   }
 
   /* ============ RENDER: DIAGNOSTIC ============ */
 
   function renderDiag(){
-    modeLabel.textContent = state.track === "short" ? "Diagnostic express" : "Diagnostic";
-    var dims = activeDims();
-    var dim = dims[state.dimIndex];
+    modeLabel.textContent = "Diagnostic";
+    var dim = DIMENSIONS[state.dimIndex];
     var answeredHere = dim.questions.every(function(_,i){ return state.answers[dim.key+"_"+i] != null; });
 
     var qsBefore = 0;
-    for(var i=0;i<state.dimIndex;i++) qsBefore += dims[i].questions.length;
+    for(var i=0;i<state.dimIndex;i++) qsBefore += DIMENSIONS[i].questions.length;
     var answeredNow = dim.questions.filter(function(_,i){return state.answers[dim.key+"_"+i]!=null;}).length;
     var pct = Math.round(((qsBefore+answeredNow) / totalDiagQuestions()) * 100);
-    setProgress(pct, "Dimension "+(state.dimIndex+1)+" / "+dims.length+" — "+(qsBefore+answeredNow)+"/"+totalDiagQuestions()+" questions", dim.name);
+    setProgress(pct, "Dimension "+(state.dimIndex+1)+" / "+DIMENSIONS.length+" — "+(qsBefore+answeredNow)+"/"+totalDiagQuestions()+" questions", dim.name);
 
     var qHtml = dim.questions.map(function(item, qi){
       var qk = dim.key+"_"+qi;
@@ -962,14 +802,14 @@
     var frag = el(
       '<div>'+
       '<div class="qcard">'+
-        '<div class="dim-label">Dimension '+(state.dimIndex+1)+' / '+dims.length+' — '+dim.name+'</div>'+
+        '<div class="dim-label">Dimension '+(state.dimIndex+1)+' / '+DIMENSIONS.length+' — '+dim.name+'</div>'+
         '<div class="dim-intro">'+dim.intro+'</div>'+
         qHtml+
       '</div>'+
       '<div class="nav-row">'+
         '<button class="btn ghost" id="diagBack">'+(state.dimIndex===0?'← Accueil':'← Précédent')+'</button>'+
         '<span class="nav-hint">'+dim.questions.filter(function(_,i){return state.answers[dim.key+"_"+i]!=null;}).length+' / '+dim.questions.length+' répondues</span>'+
-        '<button class="btn accent" id="diagNext" '+(answeredHere?'':'disabled')+'>'+(state.dimIndex===dims.length-1?'Voir mon résultat →':'Suivant →')+'</button>'+
+        '<button class="btn accent" id="diagNext" '+(answeredHere?'':'disabled')+'>'+(state.dimIndex===DIMENSIONS.length-1?'Voir mon résultat →':'Suivant →')+'</button>'+
       '</div>'+
       '</div>'
     );
@@ -987,7 +827,7 @@
       else { state.dimIndex--; render(); }
     });
     document.getElementById("diagNext").addEventListener("click", function(){
-      if(state.dimIndex < dims.length-1){ state.dimIndex++; render(); }
+      if(state.dimIndex < DIMENSIONS.length-1){ state.dimIndex++; render(); }
       else { state.screen="diagResult"; render(); }
     });
   }
@@ -995,9 +835,8 @@
   function renderDiagResult(){
     modeLabel.textContent = "Résultat";
     hideProgress();
-    var dims = activeDims();
 
-    var dimScores = dims.map(function(d){
+    var dimScores = DIMENSIONS.map(function(d){
       var vals = d.questions.map(function(_,i){ return state.answers[d.key+"_"+i] || 0; });
       var avg = vals.reduce(function(a,b){return a+b;},0) / vals.length;
       var band = bandFor(avg);
@@ -1012,22 +851,18 @@
       state.submitted = true;
       var profileForLog = PROFILES.filter(function(x){return x.key===state.profile;})[0];
       var byKey = {}; dimScores.forEach(function(d){ byKey[d.key] = d.avg.toFixed(1); });
-      var parcoursLabel = state.track === "short" ? "Express façon (12Q)" : "Complet (48Q)";
-      var payload = {
+      submitResultToSheet({
         entreprise: state.companyName || "",
-        positionnement: (profileForLog ? profileForLog.label : "") + " · " + parcoursLabel,
+        positionnement: profileForLog ? profileForLog.label : "",
         scoreGlobal: overall.toFixed(1),
-        bande: band.name
-      };
-      if(state.track === "short"){
-        payload.gouvernance = ""; payload.donnees = ""; payload.competences = ""; payload.conformite = "";
-        payload.systemes = byKey.systemeinfo || "";
-        payload.fournisseurs = "Équipement IT: "+(byKey.itequip||"")+" / Suivi de la donnée: "+(byKey.suivi||"");
-      } else {
-        payload.gouvernance = byKey.gouvernance; payload.donnees = byKey.donnees; payload.systemes = byKey.systemes;
-        payload.competences = byKey.competences; payload.conformite = byKey.conformite; payload.fournisseurs = byKey.fournisseurs;
-      }
-      submitResultToSheet(payload);
+        bande: band.name,
+        gouvernance: byKey.gouvernance,
+        donnees: byKey.donnees,
+        systemes: byKey.systemes,
+        competences: byKey.competences,
+        conformite: byKey.conformite,
+        fournisseurs: byKey.fournisseurs
+      });
     }
 
     var barsHtml = dimScores.map(function(d){
@@ -1071,7 +906,7 @@
         '<p style="font-size:12.5px;color:var(--ink-soft);margin-top:6px;">Pour chaque dimension, un objectif à court terme (0-3 mois) et à moyen terme (3-12 mois), avec échéance, calculés à partir de votre niveau atteint.</p>'+
         '<div class="matrix-list">'+matrixHtml+'</div>'
       : '<div class="plan-cta">'+
-          '<div class="pc-text"><b>Votre plan d\'action n\'est pas encore généré</b><span>Objectifs court terme et moyen terme, avec échéances, pour chacune de vos '+dims.length+' dimensions.</span></div>'+
+          '<div class="pc-text"><b>Votre plan d\'action n\'est pas encore généré</b><span>Objectifs court terme et moyen terme, avec échéances, pour chacune de vos 6 dimensions.</span></div>'+
           '<button class="btn accent" id="genPlan">Générer mon plan d\'action →</button>'+
         '</div>';
 
@@ -1079,7 +914,7 @@
       '<div>'+
       printHeaderHtml+
       '<div class="result-head">'+
-        '<div class="kicker">'+(state.track==="short"?"Diagnostic express — Confection en façon":"Diagnostic de maturité DPP complet")+'</div>'+
+        '<div class="kicker">Diagnostic de maturité DPP</div>'+
         '<div class="score-row">'+
           '<div class="score-big">'+overall.toFixed(1)+'<span style="font-size:22px;color:var(--ink-soft);">/5</span></div>'+
           '<div class="band-pill '+band.key+'">'+band.name+'</div>'+
