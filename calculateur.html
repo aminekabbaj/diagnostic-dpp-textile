@@ -165,6 +165,7 @@
     fournisseurs: 0,
     soustraitants: 0,
     controleQualite: false,
+    identifiant: "qr",
     systeme: "auto",
     connecteERP: false,
     accompagnement: false,
@@ -204,6 +205,25 @@
     if(pieces <= 1500000) return [0.10,0.15];
     return [0.08,0.12];
   }
+  /* RFID : le guide (chapitre 11) mentionne le RFID comme option pour les grandes
+     entreprises à flux logistiques importants, sans le chiffrer. Estimation indépendante
+     basée sur les prix de marché réels des étiquettes UHF textiles (inlay adhésif ou tissé,
+     hors marque/fournisseur) : environ 0,05 à 0,20 USD/étiquette selon le volume, converti
+     ici en MAD (~10 MAD/USD) avec la même dégressivité par palier que le QR code. */
+  function tarifRFID(pieces){
+    if(pieces <= 300000) return [1.20,2.50];
+    if(pieces <= 1500000) return [0.90,1.80];
+    return [0.60,1.20];
+  }
+  /* Équipement de lecture (lecteurs portables + portails fixes), coût ponctuel de mise
+     en place. Repères marché : lecteur portable ≈ 3 000-15 000 MAD/unité, portail fixe
+     avec antennes ≈ 25 000-60 000 MAD/unité, plus intégration logicielle de base. */
+  function equipementRFID(effectif){
+    if(effectif <= 50) return [15000,30000];
+    if(effectif <= 150) return [30000,60000];
+    if(effectif <= 300) return [60000,120000];
+    return [120000,250000];
+  }
   function suggestSysteme(references, effectif){
     if(references <= 15) return "tableur";
     if(references <= 50 && effectif <= 300) return "pim";
@@ -228,9 +248,14 @@
     var fournAn1 = s.regime === "faconpure" ? [0,0] : [s.fournisseurs*1250, s.fournisseurs*2000];
     var auditAn1 = [s.soustraitants*1500, s.soustraitants*3000];
 
-    var qrTarif = tarifQR(s.pieces);
-    var qrAn1 = [s.pieces*qrTarif[0], s.pieces*qrTarif[1]];
-    var qrRecur = qrAn1.slice();
+    var isRFID = s.identifiant === "rfid";
+    var idTarif = isRFID ? tarifRFID(s.pieces) : tarifQR(s.pieces);
+    var idAn1 = [s.pieces*idTarif[0], s.pieces*idTarif[1]];
+    var idRecur = idAn1.slice();
+    var idName = "Identifiant physique (" + (isRFID ? "étiquette RFID UHF" : "QR code") + ") par pièce";
+    var idNote = fmt(s.pieces)+" pièces/an × "+idTarif[0].toFixed(2)+" à "+idTarif[1].toFixed(2)+" MAD/pièce"+
+      (isRFID ? " — estimation de marché indépendante (le guide ne chiffre pas ce poste), hors équipement de lecture." : ".");
+    var equipAn1 = isRFID ? equipementRFID(s.effectif) : [0,0];
 
     var systeme = s.systeme === "auto" ? suggestSysteme(s.references, s.effectif) : s.systeme;
     var sysAn1, sysRecur, sysNote;
@@ -260,12 +285,17 @@
         note: s.regime==="faconpure" ? "Sans objet : la matière est fournie par le donneur d'ordre." : s.fournisseurs+" fournisseur(s) de matière." },
       { key:"audit", name:"Audit des sous-traitants (teinture, ennoblissement...)", an1:auditAn1, recur:auditAn1,
         note: s.soustraitants>0 ? s.soustraitants+" atelier(s) sous-traitant(s) à auditer." : "Aucun sous-traitant déclaré." },
-      { key:"qr", name:"Identifiant physique (QR code) par pièce", an1:qrAn1, recur:qrRecur,
-        note: fmt(s.pieces)+" pièces/an × "+qrTarif[0].toFixed(2)+" à "+qrTarif[1].toFixed(2)+" MAD/pièce." },
+      { key:"identifiant", name:idName, an1:idAn1, recur:idRecur, note:idNote }
+    ];
+    if(isRFID){
+      lines.push({ key:"rfidequip", name:"Équipement de lecture RFID (lecteurs, portails)", an1:equipAn1, recur:[0,0],
+        note:"Investissement ponctuel : lecteurs portables et/ou portails fixes selon vos flux logistiques — repère marché, hors le guide.", recurNote:"Ponctuel, non récurrent." });
+    }
+    lines.push(
       { key:"systeme", name:"Système d'information", an1:sysAn1, recur:sysRecur, note:sysNote },
       { key:"formation", name:"Formation et sensibilisation", an1:formAn1, recur:formRecur, note:"Selon la taille de l'équipe à former." },
       { key:"accomp", name:"Accompagnement externe ponctuel (facultatif)", an1:accompAn1, recur:[0,0], note: s.accompagnement ? "Conseil pour la structuration initiale." : "Non retenu.", recurNote:"Ponctuel, non récurrent." }
-    ];
+    );
     return lines;
   }
 
@@ -323,6 +353,14 @@
         '</div>'+
       '</div>'+
       '<div class="section">'+
+        '<h4>Identifiant physique (étiquette)</h4>'+
+        '<div class="sub">Le support qui pointe vers le passeport numérique — il ne le remplace pas (chapitre 11).</div>'+
+        '<div class="radio-row" id="idRow">'+
+          radioId("qr","QR code","Recommandé par défaut : peu coûteux, imprimable sur l\'étiquette de composition existante, compatible avec tout smartphone.")+
+          radioId("rfid","RFID (UHF)","Option pour les grandes entreprises à flux logistiques importants (guide, ch. 11) — coût par étiquette plus élevé, plus un investissement en lecteurs.")+
+        '</div>'+
+      '</div>'+
+      '<div class="section">'+
         '<h4>Chaîne d\'approvisionnement</h4>'+
         '<div class="sub">Sans objet pour la façon pure si la matière est fournie par le donneur d\'ordre.</div>'+
         '<div class="field-grid">'+
@@ -351,6 +389,9 @@
   function radioSys(key,label,sub){
     return '<label class="radio-opt'+(state.systeme===key?' sel':'')+'" data-sys="'+key+'"><span class="dotmark"></span><span class="rtext"><b>'+label+'</b><span>'+sub+'</span></span></label>';
   }
+  function radioId(key,label,sub){
+    return '<label class="radio-opt'+(state.identifiant===key?' sel':'')+'" data-idtag="'+key+'"><span class="dotmark"></span><span class="rtext"><b>'+label+'</b><span>'+sub+'</span></span></label>';
+  }
 
   function bindForm(){
     document.querySelectorAll('[data-regime]').forEach(function(b){
@@ -358,6 +399,9 @@
     });
     document.querySelectorAll('[data-sys]').forEach(function(b){
       b.addEventListener("click", function(){ state.systeme = b.getAttribute("data-sys"); render(); });
+    });
+    document.querySelectorAll('[data-idtag]').forEach(function(b){
+      b.addEventListener("click", function(){ state.identifiant = b.getAttribute("data-idtag"); render(); });
     });
     ["f_effectif","f_references","f_pieces","f_ca","f_fournisseurs","f_soustraitants","f_partclient"].forEach(function(id){
       var elx = document.getElementById(id);
@@ -376,7 +420,7 @@
       regime: state.regime, effectif: state.effectif||1, references: state.references||0,
       pieces: state.pieces||0, caExport: state.caExport||0, fournisseurs: state.fournisseurs||0,
       soustraitants: state.soustraitants||0, controleQualite: state.controleQualite,
-      systeme: state.systeme, connecteERP: state.connecteERP, accompagnement: state.accompagnement
+      identifiant: state.identifiant, systeme: state.systeme, connecteERP: state.connecteERP, accompagnement: state.accompagnement
     };
     var lines = computeLines(s);
     var totalAn1 = [0,0], totalRecur = [0,0];
