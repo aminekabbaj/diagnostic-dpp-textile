@@ -165,6 +165,7 @@
     fournisseurs: 0,
     soustraitants: 0,
     controleQualite: false,
+    essaisGratuits: false,
     identifiant: "qr",
     systeme: "auto",
     connecteERP: false,
@@ -242,18 +243,21 @@
       : "Inclus dans le temps interne (portefeuille limité).";
 
     var couverture = s.controleQualite ? 0.45 : 0;
-    var essaisAn1 = [s.references*3*300*(1-couverture), s.references*3*600*(1-couverture)];
+    var essaisAn1 = s.essaisGratuits ? [0,0] : [s.references*3*300*(1-couverture), s.references*3*600*(1-couverture)];
     var essaisRecur = essaisAn1.slice();
 
     var fournAn1 = s.regime === "faconpure" ? [0,0] : [s.fournisseurs*1250, s.fournisseurs*2000];
     var auditAn1 = [s.soustraitants*1500, s.soustraitants*3000];
 
+    var isRFIDClient = s.identifiant === "rfidclient";
     var isRFID = s.identifiant === "rfid";
     var idTarif = isRFID ? tarifRFID(s.pieces) : tarifQR(s.pieces);
-    var idAn1 = [s.pieces*idTarif[0], s.pieces*idTarif[1]];
+    var idAn1 = isRFIDClient ? [0,0] : [s.pieces*idTarif[0], s.pieces*idTarif[1]];
     var idRecur = idAn1.slice();
-    var idName = "Identifiant physique (" + (isRFID ? "étiquette RFID UHF" : "QR code") + ") par pièce";
-    var idNote = fmt(s.pieces)+" pièces/an × "+idTarif[0].toFixed(2)+" à "+idTarif[1].toFixed(2)+" MAD/pièce"+
+    var idName = "Identifiant physique (" + (isRFIDClient ? "RFID fourni par le client" : isRFID ? "étiquette RFID UHF" : "QR code") + ") par pièce";
+    var idNote = isRFIDClient
+      ? "Coût nul pour votre entreprise : le RFID (technologie complexe, prestataires vérifiés) est financé et posé par le donneur d'ordre."
+      : fmt(s.pieces)+" pièces/an × "+idTarif[0].toFixed(2)+" à "+idTarif[1].toFixed(2)+" MAD/pièce"+
       (isRFID ? " — estimation de marché indépendante (le guide ne chiffre pas ce poste), hors équipement de lecture." : ".");
     var equipAn1 = isRFID ? equipementRFID(s.effectif) : [0,0];
 
@@ -280,7 +284,8 @@
         note: jours+" jours/mois valorisés à "+fmt(taux)+" MAD/jour (coût employeur), à ajuster à votre réalité." },
       { key:"carto", name:"Cartographie des données", an1:cartoAn1, recur:[0,0], note:cartoNote, recurNote:"Ponctuel, non récurrent." },
       { key:"essais", name:"Essais de robustesse en laboratoire", an1:essaisAn1, recur:essaisRecur,
-        note: s.references+" référence(s) × 3 essais × 300-600 MAD"+(couverture>0?" (45% déjà couverts par votre contrôle qualité)":"")+"." },
+        note: s.essaisGratuits ? "Essais réalisés sans frais supplémentaires (coût nul pour votre entreprise)."
+          : s.references+" référence(s) × 3 essais × 300-600 MAD"+(couverture>0?" (45% déjà couverts par votre contrôle qualité)":"")+"." },
       { key:"fourn", name:"Certificats et négociation fournisseurs", an1:fournAn1, recur:fournAn1,
         note: s.regime==="faconpure" ? "Sans objet : la matière est fournie par le donneur d'ordre." : s.fournisseurs+" fournisseur(s) de matière." },
       { key:"audit", name:"Audit des sous-traitants (teinture, ennoblissement...)", an1:auditAn1, recur:auditAn1,
@@ -357,7 +362,8 @@
         '<div class="sub">Le support qui pointe vers le passeport numérique — il ne le remplace pas (chapitre 11).</div>'+
         '<div class="radio-row" id="idRow">'+
           radioId("qr","QR code","Recommandé par défaut : peu coûteux, imprimable sur l\'étiquette de composition existante, compatible avec tout smartphone.")+
-          radioId("rfid","RFID (UHF)","Option pour les grandes entreprises à flux logistiques importants (guide, ch. 11) — coût par étiquette plus élevé, plus un investissement en lecteurs.")+
+          radioId("rfidclient","RFID à la charge du client (coût nul)","Le donneur d'ordre finance et gère le RFID avec des prestataires vérifiés : aucun coût d'étiquette ni d'équipement pour vous.")+
+          radioId("rfid","RFID (UHF) à votre charge","Option pour les grandes entreprises à flux logistiques importants (guide, ch. 11) — coût par étiquette plus élevé, plus un investissement en lecteurs.")+
         '</div>'+
       '</div>'+
       '<div class="section">'+
@@ -381,6 +387,7 @@
       '<div class="section">'+
         '<h4>Hypothèses complémentaires</h4>'+
         '<label class="checkline"><input type="checkbox" id="f_cq" '+(state.controleQualite?'checked':'')+'><span class="ctext"><b>Nous disposons déjà d\'un contrôle qualité formalisé</b><span>Réduit d\'environ 45% le coût des essais de robustesse déjà couverts en interne.</span></span></label>'+
+        '<label class="checkline" style="margin-top:10px;"><input type="checkbox" id="f_essaisgratuits" '+(state.essaisGratuits?'checked':'')+'><span class="ctext"><b>Les essais de robustesse en laboratoire sont réalisés sans frais supplémentaires</b><span>Met ce poste à zéro (essais déjà inclus dans votre prestation ou pris en charge par un tiers).</span></span></label>'+
         '<label class="checkline" style="margin-top:10px;"><input type="checkbox" id="f_accomp" '+(state.accompagnement?'checked':'')+'><span class="ctext"><b>Prévoir un accompagnement externe ponctuel (conseil)</b><span>Facultatif, plutôt pertinent au-delà de 300 salariés — 50 000 à 100 000 MAD.</span></span></label>'+
         '<div class="field" style="margin-top:14px;max-width:340px;"><label>Part de votre CA export représentée par votre principal donneur d\'ordre (%, facultatif)</label><input type="number" id="f_partclient" min="0" max="100" placeholder="Ex. 15" value="'+state.partClient+'"><span class="hint">Permet de chiffrer le coût de l\'inaction en cas de perte de ce client.</span></div>'+
       '</div>'
@@ -412,6 +419,7 @@
     });
     var erp = document.getElementById("f_erp"); if(erp) erp.addEventListener("change", function(){ state.connecteERP = erp.checked; });
     var cq = document.getElementById("f_cq"); if(cq) cq.addEventListener("change", function(){ state.controleQualite = cq.checked; });
+    var eg = document.getElementById("f_essaisgratuits"); if(eg) eg.addEventListener("change", function(){ state.essaisGratuits = eg.checked; });
     var ac = document.getElementById("f_accomp"); if(ac) ac.addEventListener("change", function(){ state.accompagnement = ac.checked; });
   }
 
@@ -419,7 +427,7 @@
     var s = {
       regime: state.regime, effectif: state.effectif||1, references: state.references||0,
       pieces: state.pieces||0, caExport: state.caExport||0, fournisseurs: state.fournisseurs||0,
-      soustraitants: state.soustraitants||0, controleQualite: state.controleQualite,
+      soustraitants: state.soustraitants||0, controleQualite: state.controleQualite, essaisGratuits: state.essaisGratuits,
       identifiant: state.identifiant, systeme: state.systeme, connecteERP: state.connecteERP, accompagnement: state.accompagnement
     };
     var lines = computeLines(s);
