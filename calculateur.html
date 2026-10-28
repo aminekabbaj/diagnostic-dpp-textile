@@ -206,6 +206,25 @@
     if(pieces <= 1500000) return [0.10,0.15];
     return [0.08,0.12];
   }
+  /* RFID : le guide (chapitre 11) mentionne le RFID comme option pour les grandes
+     entreprises à flux logistiques importants, sans le chiffrer. Estimation indépendante
+     basée sur les prix de marché réels des étiquettes UHF textiles (inlay adhésif ou tissé,
+     hors marque/fournisseur) : environ 0,05 à 0,20 USD/étiquette selon le volume, converti
+     ici en MAD (~10 MAD/USD) avec la même dégressivité par palier que le QR code. */
+  function tarifRFID(pieces){
+    if(pieces <= 300000) return [1.20,2.50];
+    if(pieces <= 1500000) return [0.90,1.80];
+    return [0.60,1.20];
+  }
+  /* Équipement de lecture (lecteurs portables + portails fixes), coût ponctuel de mise
+     en place. Repères marché : lecteur portable ≈ 3 000-15 000 MAD/unité, portail fixe
+     avec antennes ≈ 25 000-60 000 MAD/unité, plus intégration logicielle de base. */
+  function equipementRFID(effectif){
+    if(effectif <= 50) return [15000,30000];
+    if(effectif <= 150) return [30000,60000];
+    if(effectif <= 300) return [60000,120000];
+    return [120000,250000];
+  }
   function suggestSysteme(references, effectif){
     if(references <= 15) return "tableur";
     if(references <= 50 && effectif <= 300) return "pim";
@@ -230,14 +249,17 @@
     var fournAn1 = s.regime === "faconpure" ? [0,0] : [s.fournisseurs*1250, s.fournisseurs*2000];
     var auditAn1 = [s.soustraitants*1500, s.soustraitants*3000];
 
+    var isRFIDClient = s.identifiant === "rfidclient";
     var isRFID = s.identifiant === "rfid";
-    var idTarif = tarifQR(s.pieces);
-    var idAn1 = isRFID ? [0,0] : [s.pieces*idTarif[0], s.pieces*idTarif[1]];
+    var idTarif = isRFID ? tarifRFID(s.pieces) : tarifQR(s.pieces);
+    var idAn1 = isRFIDClient ? [0,0] : [s.pieces*idTarif[0], s.pieces*idTarif[1]];
     var idRecur = idAn1.slice();
-    var idName = "Identifiant physique (" + (isRFID ? "RFID fourni par le client" : "QR code") + ") par pièce";
-    var idNote = isRFID
+    var idName = "Identifiant physique (" + (isRFIDClient ? "RFID fourni par le client" : isRFID ? "étiquette RFID UHF" : "QR code") + ") par pièce";
+    var idNote = isRFIDClient
       ? "Coût nul pour votre entreprise : le RFID (technologie complexe, prestataires vérifiés) est financé et posé par le donneur d'ordre."
-      : fmt(s.pieces)+" pièces/an × "+idTarif[0].toFixed(2)+" à "+idTarif[1].toFixed(2)+" MAD/pièce.";
+      : fmt(s.pieces)+" pièces/an × "+idTarif[0].toFixed(2)+" à "+idTarif[1].toFixed(2)+" MAD/pièce"+
+      (isRFID ? " — estimation de marché indépendante (le guide ne chiffre pas ce poste), hors équipement de lecture." : ".");
+    var equipAn1 = isRFID ? equipementRFID(s.effectif) : [0,0];
 
     var systeme = s.systeme === "auto" ? suggestSysteme(s.references, s.effectif) : s.systeme;
     var sysAn1, sysRecur, sysNote;
@@ -268,8 +290,14 @@
         note: s.regime==="faconpure" ? "Sans objet : la matière est fournie par le donneur d'ordre." : s.fournisseurs+" fournisseur(s) de matière." },
       { key:"audit", name:"Audit des sous-traitants (teinture, ennoblissement...)", an1:auditAn1, recur:auditAn1,
         note: s.soustraitants>0 ? s.soustraitants+" atelier(s) sous-traitant(s) à auditer." : "Aucun sous-traitant déclaré." },
-      { key:"identifiant", name:idName, an1:idAn1, recur:idRecur, note:idNote }
     ];
+    if(s.regime !== "faconpure"){
+      lines.push({ key:"identifiant", name:idName, an1:idAn1, recur:idRecur, note:idNote });
+    }
+    if(isRFID && s.regime !== "faconpure"){
+      lines.push({ key:"rfidequip", name:"Équipement de lecture RFID (lecteurs, portails)", an1:equipAn1, recur:[0,0],
+        note:"Investissement ponctuel : lecteurs portables et/ou portails fixes selon vos flux logistiques — repère marché, hors le guide.", recurNote:"Ponctuel, non récurrent." });
+    }
     lines.push(
       { key:"systeme", name:"Système d'information", an1:sysAn1, recur:sysRecur, note:sysNote },
       { key:"formation", name:"Formation et sensibilisation", an1:formAn1, recur:formRecur, note:"Selon la taille de l'équipe à former." },
@@ -331,14 +359,16 @@
           '<div class="field"><label>Chiffre d\'affaires export annuel (MAD)</label><input type="number" id="f_ca" min="0" step="10000" value="'+state.caExport+'"></div>'+
         '</div>'+
       '</div>'+
+      (state.regime === "faconpure" ? '' :
       '<div class="section">'+
         '<h4>Identifiant physique (étiquette)</h4>'+
         '<div class="sub">Le support qui pointe vers le passeport numérique — il ne le remplace pas (chapitre 11).</div>'+
         '<div class="radio-row" id="idRow">'+
           radioId("qr","QR code","Recommandé par défaut : peu coûteux, imprimable sur l\'étiquette de composition existante, compatible avec tout smartphone.")+
-          radioId("rfid","RFID à la charge du client (coût nul)","Le donneur d'ordre finance et gère le RFID avec des prestataires vérifiés : aucun coût d'étiquette ni d'équipement pour vous.")+
+          radioId("rfidclient","RFID à la charge du client (coût nul)","Le donneur d'ordre finance et gère le RFID avec des prestataires vérifiés : aucun coût d'étiquette ni d'équipement pour vous.")+
+          radioId("rfid","RFID (UHF) à votre charge","Option pour les grandes entreprises à flux logistiques importants (guide, ch. 11) — coût par étiquette plus élevé, plus un investissement en lecteurs.")+
         '</div>'+
-      '</div>'+
+      '</div>')+
       '<div class="section">'+
         '<h4>Chaîne d\'approvisionnement</h4>'+
         '<div class="sub">Sans objet pour la façon pure si la matière est fournie par le donneur d\'ordre.</div>'+
