@@ -167,6 +167,10 @@
   .bar-row .val{ font-family:"IBM Plex Mono"; font-size:13px; text-align:right; color:var(--ink-soft); }
 
   .plan-cta{ margin-top:34px; border:1px dashed var(--line-strong); background:var(--panel); padding:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .calc-cta{ margin-top:34px; border:1px solid var(--accent); background:var(--accent-wash); padding:20px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .calc-cta .pc-text b{ display:block; font-family:"Archivo"; font-size:15px; margin-bottom:4px; }
+  .calc-cta .pc-text span{ font-size:12.5px; color:var(--ink-soft); }
+  .calc-cta a.btn{ text-decoration:none; display:inline-block; }
   .plan-cta .pc-text b{ display:block; font-family:"Archivo"; font-size:15px; margin-bottom:4px; }
   .plan-cta .pc-text span{ font-size:12.5px; color:var(--ink-soft); }
 
@@ -199,7 +203,7 @@
   .print-header{ display:none; }
 
   @media print{
-    .topbar, .footer-nav, .plan-cta button, .download-row, .about-note, .onboard, .start-row{ display:none !important; }
+    .topbar, .footer-nav, .calc-cta, .plan-cta button, .download-row, .about-note, .onboard, .start-row{ display:none !important; }
     * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; color-adjust:exact !important; }
     body{ background:#fff; font-size:12px; }
     #app{ max-width:100%; padding:0; }
@@ -750,6 +754,7 @@
           '<button class="btn accent" id="startDiag" disabled>Commencer le diagnostic →</button>'+
           '<span class="start-hint" id="startHint">Choisissez d\'abord votre positionnement ci-dessus.</span>'+
         '</div>'+
+        '<div class="calc-cta"><div class="pc-text"><b>Estimez le coût de votre mise en conformité DPP</b><span>Calculateur de coûts : identifiant produit, QR, RFID, selon votre régime.</span></div><a class="btn accent" href="./calculateur.html">Ouvrir le calculateur de coûts →</a></div>'+
         '<p class="about-note">Cet outil est une auto-évaluation pédagogique, calquée sur le questionnaire de maturité du Guide opérationnel DPP (Partie V, Outil 1). Il ne remplace pas une analyse juridique et ne constitue pas un dépôt officiel de données DPP.</p>'+
       '</div>'
     );
@@ -928,6 +933,7 @@
       profileHtml+
       '<div class="download-row"><button class="btn accent" id="downloadPdf">⬇ Télécharger le constat (PDF)</button></div>'+
       planSectionHtml+
+      '<div class="calc-cta"><div class="pc-text"><b>Estimez le coût de votre mise en conformité DPP</b><span>Calculateur de coûts : identifiant produit, QR, RFID, selon votre régime.</span></div><a class="btn accent" href="./calculateur.html">Ouvrir le calculateur de coûts →</a></div>'+
       '<div class="footer-nav">'+
         '<button class="btn ghost" id="retakeDiag">↺ Refaire le diagnostic</button>'+
         '<button class="btn ghost" id="toHome">← Accueil</button>'+
