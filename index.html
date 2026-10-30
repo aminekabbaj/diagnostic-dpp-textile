@@ -277,62 +277,19 @@
     return BANDS[BANDS.length-1];
   }
 
-  /* 48 questions, 6 dimensions x 8 — modelées sur l'Outil 1 (Questionnaire d'auto-évaluation
-     de maturité) du Guide opérationnel DPP, avec des réponses réécrites en descriptions
-     concrètes plutôt qu'une échelle abstraite. */
+  /* Questionnaire court, 6 dimensions, modelé sur l'Outil 1 (Questionnaire d'auto-évaluation
+     de maturité) du Guide opérationnel DPP. 2 ou 3 réponses maximum par question (oui/non ou
+     3 niveaux, notés 1-5 ou 1-3-5). `only` : liste des positionnements concernés (absent = tous). */
 
   var DIMENSIONS = [
     { key:"gouvernance", name:"Gouvernance",
       intro:"Qui pilote le sujet, avec quel mandat, quel budget et quel suivi (chapitres 12-13).",
       questions:[
-        { q:"Le sujet DPP / traçabilité est-il porté par quelqu'un dans votre entreprise ?", opts:[
-          "Personne n'en a la charge ; le sujet n'a jamais été discuté en interne.",
-          "Une personne en a entendu parler, sans mandat ni temps dédié.",
-          "Une personne suit le sujet de façon informelle, en plus de son poste habituel.",
-          "Un référent est désigné, avec un accord oral de la direction.",
-          "Un référent est désigné par écrit, avec un mandat clair et du temps dédié."]},
-        { q:"Ce référent dispose-t-il d'un mandat formalisé par la direction ?", opts:[
-          "Aucun mandat n'existe, même informel.",
-          "La direction est au courant mais n'a rien formalisé.",
-          "Un accord oral existe, sans document ni périmètre défini.",
-          "Un mandat écrit existe, mais sans moyens ni échéances précisés.",
-          "Un mandat écrit précise le périmètre, le temps alloué et les échéances."]},
-        { q:"Existe-t-il un comité ou un point de suivi régulier consacré au sujet ?", opts:[
-          "Aucun suivi n'existe ; le sujet n'est jamais à l'ordre du jour.",
-          "Le sujet est parfois évoqué de façon improvisée, sans rythme fixe.",
-          "Un point est fait occasionnellement, sans calendrier fixe.",
-          "Un point de suivi existe, à un rythme irrégulier.",
-          "Un comité ou point de suivi se réunit à intervalle régulier, avec compte-rendu."]},
-        { q:"La direction générale a-t-elle été informée des échéances réglementaires ?", opts:[
-          "La direction n'a jamais été informée du calendrier DPP.",
-          "La direction a entendu parler du sujet, sans détail sur le calendrier.",
-          "La direction connaît le sujet dans les grandes lignes, sans les échéances précises.",
-          "La direction a été informée du calendrier réglementaire de façon formelle.",
-          "La direction suit activement le calendrier et arbitre les décisions liées au DPP."]},
-        { q:"Les responsabilités entre fonctions sont-elles clarifiées (par exemple via une matrice RACI) ?", opts:[
-          "Aucune répartition des responsabilités n'existe entre fonctions.",
-          "Chacun agit de son côté, sans coordination ni répartition claire.",
-          "Une répartition informelle existe, jamais mise par écrit.",
-          "Une répartition des rôles existe par écrit, mais incomplète.",
-          "Une matrice de type RACI formalise clairement qui fait quoi."]},
-        { q:"Existe-t-il un budget identifié pour la préparation au DPP ?", opts:[
-          "Aucun budget n'a été envisagé pour ce sujet.",
-          "Le sujet a été mentionné en discussion budgétaire, sans suite.",
-          "Un ordre de grandeur informel existe, non validé.",
-          "Un budget indicatif a été validé pour une partie des actions.",
-          "Un budget dédié est validé et suit les postes de dépense identifiés."]},
-        { q:"Le sujet DPP est-il intégré aux objectifs annuels d'au moins une fonction ?", opts:[
-          "Le DPP n'apparaît dans les objectifs d'aucune fonction.",
-          "Le sujet est mentionné informellement, sans objectif chiffré.",
-          "Un objectif existe pour une fonction, de façon peu précise.",
-          "Un ou plusieurs objectifs liés au DPP figurent dans les objectifs annuels.",
-          "Le DPP fait partie des objectifs annuels d'au moins une fonction, suivis formellement."]},
-        { q:"L'entreprise dispose-t-elle d'un plan d'action écrit, même sommaire ?", opts:[
-          "Aucun plan, aucune réflexion engagée.",
-          "Le sujet a été évoqué en réunion, sans aucune trace écrite.",
-          "Une liste d'actions existe, non formalisée ni suivie.",
-          "Un plan écrit existe, avec des échéances approximatives.",
-          "Un plan écrit existe, avec échéances, responsables et suivi régulier."]}
+        { q:"Quelqu'un est-il désigné pour suivre le sujet DPP / traçabilité ?", opts:["Non, personne", "Oui, de façon informelle", "Oui, par écrit, avec un mandat de la direction"] },
+        { q:"La direction connaît-elle les échéances réglementaires du DPP ?", opts:["Non", "Oui"] },
+        { q:"Un budget est-il prévu pour préparer le DPP ?", opts:["Non", "Oui"] },
+        { q:"Existe-t-il un plan d'action écrit, même sommaire ?", opts:["Non", "Une liste d'actions informelle", "Oui, avec échéances et responsables"] },
+        { q:"Un point de suivi régulier est-il consacré au sujet ?", opts:["Non", "Oui"] }
       ],
       matrix:{
         nonengage:{ action:"Désigner un référent DPP et obtenir un mandat écrit.",
@@ -352,54 +309,12 @@
     { key:"donnees", name:"Données",
       intro:"Ce que vous savez déjà de vos produits, matières, procédés et impacts (chapitres 4 à 10).",
       questions:[
-        { q:"L'entreprise dispose-t-elle d'un registre centralisé de ses références produit ?", opts:[
-          "Aucun registre n'existe ; les références sont dispersées.",
-          "Une liste existe, mais incomplète et non mise à jour.",
-          "Un registre existe pour une partie des références seulement.",
-          "Un registre centralisé couvre la majorité des références exportées.",
-          "Un registre centralisé et à jour couvre l'ensemble des références."]},
-        { q:"La composition matière est-elle documentée pour chaque référence exportée vers l'Europe ?", opts:[
-          "La composition n'est ni demandée ni archivée.",
-          "Une étiquette de composition existe, sans vérification ni classement.",
-          "La composition est documentée pour certaines références seulement.",
-          "La composition est documentée pour la majorité des références.",
-          "La composition est documentée et archivée systématiquement, référence par référence."]},
-        { q:"L'origine des fibres est-elle connue et documentée pour chaque référence ?", opts:[
-          "L'origine des fibres n'est pas connue ni demandée.",
-          "L'information circule parfois oralement, jamais archivée.",
-          "L'origine est documentée pour quelques références sensibles.",
-          "L'origine est documentée pour la majorité des matières utilisées.",
-          "L'origine de chaque fibre est tracée et documentée par lot."]},
-        { q:"Les données sont-elles disponibles au niveau du lot de production ?", opts:[
-          "Aucune donnée n'est suivie au niveau du lot ; tout est global.",
-          "Le lot est identifié en atelier, sans donnée associée archivée.",
-          "Certaines données de lot sont conservées, de façon incomplète.",
-          "Les principales données sont disponibles par lot pour la majorité des références.",
-          "Les données sont systématiquement rattachées au lot correspondant."]},
-        { q:"Une cartographie des données (data mapping) a-t-elle été réalisée ?", opts:[
-          "Aucune cartographie n'a été engagée.",
-          "Le sujet a été évoqué, sans exercice réalisé.",
-          "Une cartographie partielle existe, sur quelques références.",
-          "Une cartographie couvre la majorité des références exportées vers l'UE.",
-          "Une cartographie complète identifie, pour chaque référence, les données disponibles et les écarts."]},
-        { q:"Les données environnementales de production sont-elles mesurées, même partiellement ?", opts:[
-          "Aucune donnée environnementale (eau, énergie, déchets) n'est mesurée.",
-          "Des factures globales existent, sans lien avec la production.",
-          "Certaines consommations sont suivies, de façon ponctuelle.",
-          "Les principales consommations sont mesurées par atelier ou par période.",
-          "Les données environnementales sont mesurées et rattachées à la production, au moins par lot."]},
-        { q:"Les données sociales et les certifications sont-elles centralisées dans un même registre ?", opts:[
-          "Aucune donnée sociale ni certification n'est centralisée.",
-          "Les documents existent mais sont dispersés entre services.",
-          "Une partie des audits et certifications est centralisée.",
-          "La majorité des données sociales et certifications sont centralisées et à jour.",
-          "L'ensemble des données sociales et certifications est centralisé, classé et à jour."]},
-        { q:"Les données logistiques et de fin de vie font-elles l'objet d'un suivi, même minimal ?", opts:[
-          "Aucun suivi du transport, de l'emballage ou de la fin de vie.",
-          "Quelques informations existent, jamais formalisées.",
-          "Un suivi partiel existe pour certaines références ou certains flux.",
-          "Les principales données logistiques sont documentées.",
-          "Le transport, l'emballage et les instructions de fin de vie sont documentés systématiquement."]}
+        { q:"Vos références (articles, tissus, modèles) sont-elles centralisées dans un registre ?", opts:["Non, elles sont dispersées", "En partie", "Oui, complet et à jour"] },
+        { q:"La composition matière est-elle documentée pour chaque référence ?", opts:["Non", "Pour certaines références", "Oui, systématiquement"], only:["amont", "teinture", "cotraitance", "integre", "marque", "mixte"] },
+        { q:"L'origine des fibres est-elle connue et archivée ?", opts:["Non", "Pour certaines matières", "Oui, pour toutes"], only:["amont", "teinture", "cotraitance", "integre", "marque", "mixte"] },
+        { q:"Vos consommations d'eau, d'énergie et vos déchets sont-ils mesurés ?", opts:["Non", "Globalement (factures)", "Oui, par atelier ou par lot"] },
+        { q:"Vos certifications et audits sociaux sont-ils centralisés au même endroit ?", opts:["Non", "En partie", "Oui, à jour"] },
+        { q:"Le transport, l'emballage et la fin de vie de vos produits sont-ils documentés ?", opts:["Non", "Pour certains produits", "Oui, systématiquement"], only:["integre", "marque", "mixte"] }
       ],
       matrix:{
         nonengage:{ action:"Créer un registre centralisé, même dans un simple tableur.",
@@ -419,54 +334,10 @@
     { key:"systemes", name:"Systèmes d'information",
       intro:"Vos outils actuels et leur capacité à produire une donnée structurée et exportable (chapitre 11).",
       questions:[
-        { q:"L'entreprise dispose-t-elle d'un ERP en fonctionnement ?", opts:[
-          "Aucun ERP ; la gestion repose sur papier ou fichiers isolés.",
-          "Un ERP existe mais n'est utilisé que pour une fonction limitée (ex. comptabilité).",
-          "Un ERP couvre une partie de la production ou des stocks.",
-          "Un ERP structuré couvre la majorité des opérations.",
-          "Un ERP complet et à jour couvre l'ensemble des opérations de l'entreprise."]},
-        { q:"Cet ERP (ou système équivalent) intègre-t-il un module dédié aux données produit ?", opts:[
-          "Aucun module ou système ne centralise les données produit.",
-          "Les données produit sont dans des fichiers séparés, non reliés au système central.",
-          "Un module existe mais reste peu utilisé ou incomplet.",
-          "Un module dédié centralise la majorité des données produit.",
-          "Un module ou système dédié centralise l'ensemble des données produit."]},
-        { q:"L'entreprise a-t-elle évalué l'intérêt d'un système PIM ou PLM ?", opts:[
-          "Le sujet n'a jamais été évalué.",
-          "Le sujet a été mentionné, sans recherche ni comparaison.",
-          "Une recherche informelle a été menée, sans décision.",
-          "Une évaluation a été faite, avec une recommandation informelle.",
-          "Une évaluation formelle (besoins, coûts, options) a été réalisée."]},
-        { q:"Les données produit sont-elles accessibles sans recourir à des fichiers dispersés ?", opts:[
-          "Les données sont dispersées entre plusieurs fichiers et personnes.",
-          "Une tentative de centralisation existe, mais incohérente.",
-          "Une partie des données est centralisée, le reste reste dispersé.",
-          "La majorité des données produit sont centralisées et accessibles.",
-          "L'ensemble des données produit est centralisé et accessible à qui en a besoin."]},
-        { q:"Un identifiant physique (QR code ou équivalent) est-il déjà utilisé sur vos produits ?", opts:[
-          "Aucun identifiant physique n'est utilisé sur les produits.",
-          "Un identifiant existe pour un usage interne uniquement (ex. code-barres stock).",
-          "Un QR code ou identifiant est testé sur une gamme limitée.",
-          "Un QR code est utilisé sur une partie significative des références.",
-          "Un QR code ou identifiant équivalent est utilisé systématiquement sur les produits."]},
-        { q:"Les systèmes actuels permettraient-ils d'exporter des données dans un format structuré ?", opts:[
-          "Aucune donnée n'est exportable sans ressaisie manuelle complète.",
-          "Un export existe, mais dans un format peu exploitable (PDF, papier scanné).",
-          "Un export structuré existe pour une partie des données.",
-          "La majorité des données sont exportables dans un format structuré.",
-          "L'ensemble des données pertinentes est exportable dans un format structuré, sans ressaisie."]},
-        { q:"L'entreprise a-t-elle identifié un budget indicatif pour une éventuelle mise à niveau technologique ?", opts:[
-          "Aucune réflexion budgétaire n'a été engagée.",
-          "Le sujet a été mentionné sans chiffrage.",
-          "Un ordre de grandeur informel existe, non validé.",
-          "Un budget indicatif a été estimé pour une éventuelle mise à niveau.",
-          "Un budget a été validé et rattaché à un calendrier de mise en œuvre."]},
-        { q:"Un responsable informatique est-il associé aux réflexions sur le sujet DPP ?", opts:[
-          "Aucune personne IT n'est associée au sujet.",
-          "L'IT est informée après coup, sans association aux décisions.",
-          "L'IT est consultée ponctuellement, sans rôle défini.",
-          "L'IT participe régulièrement aux discussions sur le sujet.",
-          "L'IT est pleinement associée à la démarche, avec un rôle clair."]}
+        { q:"Disposez-vous d'un ERP en fonctionnement ?", opts:["Non", "Oui"] },
+        { q:"Vos données produit sont-elles accessibles sans fichiers dispersés ?", opts:["Non, fichiers éparpillés", "En partie", "Oui, centralisées"] },
+        { q:"Un identifiant physique (QR code ou équivalent) est-il déjà utilisé sur vos produits ?", opts:["Non", "Oui"], only:["cotraitance", "integre", "marque", "mixte"] },
+        { q:"Pouvez-vous exporter vos données dans un format structuré (Excel, CSV) ?", opts:["Non", "Avec beaucoup de travail manuel", "Oui, facilement"] }
       ],
       matrix:{
         nonengage:{ action:"Faire l'état des lieux de l'existant. Ne rien acheter dans l'immédiat.",
@@ -486,54 +357,10 @@
     { key:"competences", name:"Compétences",
       intro:"Ce que vos équipes savent déjà, et comment cette connaissance circule (chapitres 1 à 3, 18).",
       questions:[
-        { q:"Au moins une personne dans l'entreprise connaît-elle les grandes lignes du règlement ESPR ?", opts:[
-          "Personne n'a entendu parler de l'ESPR ou du DPP.",
-          "Le sujet a été vaguement mentionné par un client, sans être creusé.",
-          "Une personne a lu quelques informations générales sur le sujet.",
-          "Une personne connaît les grandes lignes du calendrier et des obligations.",
-          "Plusieurs personnes maîtrisent le sujet et savent ce qui concerne réellement l'entreprise."]},
-        { q:"Une sensibilisation a-t-elle déjà été organisée en interne sur ce sujet ?", opts:[
-          "Non, jamais ; ce n'est pas un sujet connu en interne.",
-          "Le sujet a été mentionné oralement, sans support ni suivi.",
-          "Une information ponctuelle a circulé (email, réunion), sans formation.",
-          "Une session de sensibilisation a eu lieu pour une partie des équipes.",
-          "Une formation a été organisée, avec des participants de plusieurs fonctions."]},
-        { q:"L'entreprise a-t-elle participé à des formations proposées par l'AMITH, le CTTH ou GTEX ?", opts:[
-          "L'entreprise n'a participé à aucune formation ou atelier sur le sujet.",
-          "L'entreprise a entendu parler de ces formations, sans y participer.",
-          "Une participation ponctuelle a eu lieu, sans suite.",
-          "L'entreprise participe occasionnellement à ces formations.",
-          "L'entreprise participe régulièrement aux formations et ateliers sectoriels."]},
-        { q:"Les équipes de production connaissent-elles l'importance des données qu'elles peuvent fournir ?", opts:[
-          "Les équipes de production ignorent totalement le sujet.",
-          "Quelques responsables en ont entendu parler, pas les équipes.",
-          "Une partie des équipes a été informée, sans lien direct avec leur travail quotidien.",
-          "Les équipes de production comprennent globalement pourquoi ces données comptent.",
-          "Les équipes de production savent précisément quelles données elles doivent fournir, et pourquoi."]},
-        { q:"L'entreprise dispose-t-elle d'une personne capable de dialoguer techniquement avec un donneur d'ordre sur ce sujet ?", opts:[
-          "Personne ne serait en mesure de répondre à une demande DPP d'un client.",
-          "Une personne pourrait répondre, mais de façon très limitée.",
-          "Une personne peut échanger sur les bases, sans expertise approfondie.",
-          "Une personne dialogue déjà avec certains clients sur ces sujets.",
-          "Une ou plusieurs personnes dialoguent régulièrement et techniquement avec les donneurs d'ordre."]},
-        { q:"Une veille réglementaire, même informelle, est-elle assurée sur l'évolution du dossier DPP ?", opts:[
-          "Aucune veille n'est assurée sur l'évolution du dossier DPP.",
-          "La veille dépend du hasard des informations reçues des clients.",
-          "Une veille informelle et irrégulière existe.",
-          "Une veille régulière, même informelle, est assurée par une personne identifiée.",
-          "Une veille structurée est assurée et partagée avec les fonctions concernées."]},
-        { q:"L'entreprise a-t-elle prévu de participer à un atelier de sensibilisation sectoriel ?", opts:[
-          "Aucune participation n'est prévue ni envisagée.",
-          "Le sujet a été évoqué sans engagement.",
-          "Une participation est envisagée sans être planifiée.",
-          "Une participation est planifiée pour les prochains mois.",
-          "L'entreprise participe déjà activement aux initiatives sectorielles (AMITH, CTTH, GTEX)."]},
-        { q:"Un plan de montée en compétence est-il envisagé pour les mois à venir ?", opts:[
-          "Aucun plan n'est envisagé.",
-          "Le sujet a été mentionné sans intention concrète.",
-          "Une intention existe, sans plan formalisé.",
-          "Un plan de montée en compétence est envisagé pour les prochains mois.",
-          "Un plan de montée en compétence est défini et engagé, avec des actions concrètes."]}
+        { q:"Quelqu'un dans l'entreprise connaît-il les grandes lignes du règlement ESPR / DPP ?", opts:["Non", "Vaguement", "Oui"] },
+        { q:"Avez-vous suivi une formation ou un atelier (AMITH, CTTH, GTEX…) sur le sujet ?", opts:["Non", "Oui"] },
+        { q:"Vos équipes de production savent-elles quelles données elles doivent fournir ?", opts:["Non", "Oui"] },
+        { q:"Une personne peut-elle dialoguer techniquement avec un donneur d'ordre sur le DPP ?", opts:["Non", "Oui"] }
       ],
       matrix:{
         nonengage:{ action:"Organiser une sensibilisation interne courte pour les fonctions clés.",
@@ -553,54 +380,10 @@
     { key:"conformite", name:"Conformité",
       intro:"Vos certificats, audits et fiches de sécurité, et leur capacité à être mobilisés rapidement (chapitres 5, 8, 17).",
       questions:[
-        { q:"L'entreprise connaît-elle les certifications déjà détenues par ses fournisseurs de matière ?", opts:[
-          "Les certifications des fournisseurs ne sont ni connues ni demandées.",
-          "Certaines certifications sont mentionnées oralement, sans preuve.",
-          "Les certifications sont connues pour certains fournisseurs seulement.",
-          "Les certifications sont connues pour la majorité des fournisseurs de matière.",
-          "Les certifications de tous les fournisseurs de matière sont connues et documentées."]},
-        { q:"Ces certifications sont-elles centralisées et à jour ?", opts:[
-          "Aucune centralisation ; les documents sont dispersés ou perdus.",
-          "Une tentative de classement existe, non maintenue à jour.",
-          "Une partie des certifications est centralisée.",
-          "La majorité des certifications sont centralisées et suivies.",
-          "L'ensemble des certifications est centralisé, avec suivi des dates de validité."]},
-        { q:"L'entreprise a-t-elle déjà réalisé des audits sociaux avec ses donneurs d'ordre ?", opts:[
-          "Aucun audit social n'a jamais été réalisé.",
-          "Un audit a eu lieu une fois, il y a longtemps.",
-          "Des audits ont lieu occasionnellement, à la demande ponctuelle d'un client.",
-          "Des audits sociaux sont réalisés régulièrement avec plusieurs donneurs d'ordre.",
-          "Des audits sociaux réguliers sont réalisés et anticipés, indépendamment des demandes clients."]},
-        { q:"Les résultats de ces audits sont-ils conservés dans un format réutilisable ?", opts:[
-          "Les résultats d'audits ne sont pas conservés de façon exploitable.",
-          "Les rapports existent sur papier, non centralisés.",
-          "Les rapports sont conservés, mais dans des formats hétérogènes.",
-          "Les rapports sont conservés de façon centralisée et consultable.",
-          "Les résultats sont conservés dans un format structuré, prêt à être réutilisé pour le DPP."]},
-        { q:"L'entreprise suit-elle les évolutions de la réglementation REACH applicable aux substances chimiques ?", opts:[
-          "La réglementation REACH n'est ni connue ni suivie.",
-          "REACH est vaguement connu, sans suivi actif.",
-          "Un suivi existe pour certaines substances seulement.",
-          "Un suivi régulier de REACH est assuré pour les principales substances utilisées.",
-          "Un suivi structuré de REACH est assuré et documenté pour l'ensemble des substances concernées."]},
-        { q:"Les fiches de données de sécurité des produits chimiques utilisés sont-elles disponibles ?", opts:[
-          "Aucune fiche de sécurité n'est suivie ou demandée.",
-          "Certaines fiches existent, dispersées ou obsolètes.",
-          "Les fiches existent pour les produits principaux, pas pour tous.",
-          "Les fiches sont disponibles pour la majorité des produits chimiques utilisés.",
-          "Toutes les fiches de sécurité sont disponibles, classées et à jour."]},
-        { q:"L'entreprise a-t-elle une visibilité sur les exigences spécifiques de chacun de ses donneurs d'ordre ?", opts:[
-          "Les exigences de chaque client ne sont pas suivies formellement.",
-          "Les exigences sont connues de mémoire, sans document de référence.",
-          "Certaines exigences clients sont documentées, pas toutes.",
-          "Les exigences des principaux clients sont documentées et suivies.",
-          "Les exigences de chaque donneur d'ordre sont documentées et régulièrement mises à jour."]},
-        { q:"Un dispositif de mise à jour continue de la conformité est-il envisagé ?", opts:[
-          "Aucun dispositif n'est envisagé ; la conformité est traitée au cas par cas.",
-          "Le sujet a été mentionné, sans intention concrète.",
-          "Une intention existe, sans dispositif défini.",
-          "Un dispositif est envisagé, sans être encore opérationnel.",
-          "Un dispositif de mise à jour continue est en place et suivi."]}
+        { q:"Connaissez-vous et centralisez-vous les certifications de vos fournisseurs de matière ?", opts:["Non", "En partie", "Oui, à jour"], only:["amont", "teinture", "cotraitance", "integre", "marque", "mixte"] },
+        { q:"Avez-vous déjà réalisé des audits sociaux, et leurs résultats sont-ils conservés ?", opts:["Non", "Oui, mais dispersés", "Oui, conservés de façon réutilisable"] },
+        { q:"Les fiches de données de sécurité (REACH) de vos produits chimiques sont-elles disponibles ?", opts:["Non", "Pour certains produits", "Oui, pour tous"], only:["amont", "teinture", "integre", "mixte"] },
+        { q:"Connaissez-vous les exigences DPP propres à chacun de vos donneurs d'ordre ?", opts:["Non", "Oui"] }
       ],
       matrix:{
         nonengage:{ action:"Recenser les certifications déjà existantes. Ne rien jeter.",
@@ -620,54 +403,10 @@
     { key:"fournisseurs", name:"Fournisseurs & sous-traitance",
       intro:"Ce que vous savez de votre chaîne amont et de vos ateliers sous-traitants (chapitres 5, 6, 15).",
       questions:[
-        { q:"L'entreprise dispose-t-elle d'une liste à jour de tous ses sous-traitants ?", opts:[
-          "Aucune liste formelle des sous-traitants n'existe.",
-          "Une liste existe, mais elle est ancienne ou incomplète.",
-          "Une liste existe pour les sous-traitants principaux seulement.",
-          "Une liste à jour existe pour la majorité des sous-traitants.",
-          "Une liste à jour et complète existe, avec coordonnées et prestations réalisées."]},
-        { q:"Des exigences de transmission de données figurent-elles dans les contrats fournisseurs ?", opts:[
-          "Aucun contrat n'aborde la transmission de données.",
-          "Le sujet est parfois évoqué à l'oral, jamais par écrit.",
-          "Une clause générique existe, sans détail sur les données à transmettre.",
-          "Certains contrats précisent les modalités de transmission des données.",
-          "Les contrats précisent clairement quelles données transmettre, comment et à quelle fréquence."]},
-        { q:"Les ateliers de teinture ou d'ennoblissement sous-traités sont-ils audités ?", opts:[
-          "Aucun audit n'est réalisé chez ces sous-traitants.",
-          "Un audit a eu lieu une fois, sans suivi.",
-          "Certains ateliers sont audités, pas tous.",
-          "La majorité des ateliers de teinture ou d'ennoblissement sous-traités sont audités.",
-          "Tous les ateliers sous-traités critiques sont audités régulièrement."]},
-        { q:"L'origine des matières fournies sous régime ATPA fait-elle l'objet d'une demande explicite au donneur d'ordre ?", opts:[
-          "L'origine des matières fournies n'est jamais demandée au donneur d'ordre.",
-          "La question est posée oralement, sans suivi ni réponse formalisée.",
-          "L'origine est demandée pour certaines commandes seulement.",
-          "L'origine est demandée systématiquement pour les nouvelles références.",
-          "L'origine des matières est demandée et documentée systématiquement auprès du donneur d'ordre."]},
-        { q:"Un protocole de transmission de données est-il envisagé avec les principaux fournisseurs ?", opts:[
-          "Aucun protocole n'est envisagé.",
-          "Le sujet a été mentionné, sans proposition concrète.",
-          "Une réflexion est engagée avec un ou deux fournisseurs.",
-          "Un protocole est envisagé avec les principaux fournisseurs.",
-          "Un protocole formalisé existe avec les fournisseurs et sous-traitants clés."]},
-        { q:"Les sous-traitants sont-ils informés des enjeux du DPP par l'entreprise donneuse d'ordre locale ?", opts:[
-          "Les sous-traitants n'ont jamais été informés du sujet.",
-          "Le sujet a été mentionné informellement à un ou deux sous-traitants.",
-          "Certains sous-traitants ont été informés, pas tous.",
-          "La majorité des sous-traitants critiques ont été sensibilisés.",
-          "Tous les sous-traitants concernés ont été informés et sensibilisés au sujet."]},
-        { q:"L'entreprise a-t-elle évalué le risque de dépendance à des fournisseurs peu coopératifs sur ce sujet ?", opts:[
-          "Ce risque n'a jamais été évalué.",
-          "Le risque a été évoqué informellement, sans analyse.",
-          "Une évaluation partielle existe, sur quelques fournisseurs critiques.",
-          "Le risque est évalué pour la majorité des fournisseurs stratégiques.",
-          "Le risque est évalué systématiquement et intégré aux décisions d'achat."]},
-        { q:"Existe-t-il une clause de révision des contrats fournisseurs en cas d'évolution réglementaire ?", opts:[
-          "Aucun contrat ne prévoit de clause de révision réglementaire.",
-          "Le sujet n'a jamais été discuté avec les fournisseurs ou clients.",
-          "Une clause générique existe dans certains contrats, sans lien direct avec le DPP.",
-          "Une clause de révision liée à la réglementation existe dans certains contrats récents.",
-          "Une clause de révision réglementaire est systématiquement intégrée aux nouveaux contrats."]}
+        { q:"Disposez-vous d'une liste à jour de vos fournisseurs et sous-traitants ?", opts:["Non", "Oui"] },
+        { q:"Vos contrats prévoient-ils la transmission de données (matières, procédés) ?", opts:["Non", "Oui, de façon informelle", "Oui, par clause contractuelle"] },
+        { q:"Vos ateliers sous-traités (teinture, ennoblissement…) sont-ils audités ?", opts:["Non", "Certains", "Oui, tous"], only:["cotraitance", "integre", "marque", "mixte"] },
+        { q:"Demandez-vous explicitement l'origine des matières fournies par le donneur d'ordre (ATPA) ?", opts:["Non", "Oui"], only:["soustraitance", "cotraitance", "mixte"] }
       ],
       matrix:{
         nonengage:{ action:"Établir la liste complète de vos sous-traitants.",
@@ -723,7 +462,16 @@
   }
   function hideProgress(){ stitchWrap.hidden = true; }
   function el(html){ var d = document.createElement("div"); d.innerHTML = html.trim(); return d.firstElementChild; }
-  function totalDiagQuestions(){ return DIMENSIONS.reduce(function(a,d){return a+d.questions.length;},0); }
+  /* questions applicables au positionnement choisi ; idx = index d'origine (clé stable des réponses) */
+  function dimQuestions(d){
+    var out = [];
+    d.questions.forEach(function(item, i){
+      if(!item.only || item.only.indexOf(state.profile) !== -1) out.push({ item:item, qk:d.key+"_"+i });
+    });
+    return out;
+  }
+  function scoreOf(item, n){ return item.opts.length===2 ? (n===1?1:5) : (n-1)*2+1; }
+  function totalDiagQuestions(){ return DIMENSIONS.reduce(function(a,d){return a+dimQuestions(d).length;},0); }
   function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
 
   /* ============ RENDER: HOME ============ */
@@ -735,9 +483,9 @@
       '<div>'+
         '<div class="hero">'+
           '<h1>Où en est votre entreprise face au DPP&nbsp;?</h1>'+
-          '<p class="lede">Un diagnostic complet, en 6 dimensions et 48 questions, pour situer précisément la préparation de votre entreprise face au futur passeport digital des produits — et identifier vos priorités concrètes, chapitre par chapitre.</p>'+
+          '<p class="lede">Un diagnostic complet, en 6 dimensions et une vingtaine de questions adaptées à votre positionnement, pour situer précisément la préparation de votre entreprise face au futur passeport digital des produits — et identifier vos priorités concrètes, chapitre par chapitre.</p>'+
           '<div class="source"><span class="dot"></span>Contenu basé sur le Guide opérationnel DPP Textile Maroc — SIPPO / AMITH / Swisscontact</div>'+
-          '<div class="meta"><span><b>48</b> questions</span><span><b>~15</b> min</span><span><b>6</b> dimensions</span></div>'+
+          '<div class="meta"><span><b>~22</b> questions</span><span><b>~5</b> min</span><span><b>6</b> dimensions</span></div>'+
           '<p class="scope">Ouvert à toutes les entreprises marocaines du textile et de l\'habillement — de la filature à la confection, en sous-traitance comme sous marque propre.</p>'+
         '</div>'+
         '<div class="onboard">'+
@@ -747,7 +495,7 @@
         '</div>'+
         '<div class="onboard">'+
           '<h4>Pour commencer</h4>'+
-          '<div class="sub">Quel est votre positionnement principal dans la chaîne&nbsp;? Cela permet d\'adapter la lecture de votre résultat, sans changer les questions posées.</div>'+
+          '<div class="sub">Quel est votre positionnement principal dans la chaîne&nbsp;? Les questions posées et la lecture de votre résultat sont adaptées à votre réponse.</div>'+
           '<div class="profile-grid" id="profileGrid"></div>'+
         '</div>'+
         '<div class="start-row">'+
@@ -785,16 +533,17 @@
   function renderDiag(){
     modeLabel.textContent = "Diagnostic";
     var dim = DIMENSIONS[state.dimIndex];
-    var answeredHere = dim.questions.every(function(_,i){ return state.answers[dim.key+"_"+i] != null; });
+    var dq = dimQuestions(dim);
+    var answeredHere = dq.every(function(x){ return state.answers[x.qk] != null; });
 
     var qsBefore = 0;
-    for(var i=0;i<state.dimIndex;i++) qsBefore += DIMENSIONS[i].questions.length;
-    var answeredNow = dim.questions.filter(function(_,i){return state.answers[dim.key+"_"+i]!=null;}).length;
+    for(var i=0;i<state.dimIndex;i++) qsBefore += dimQuestions(DIMENSIONS[i]).length;
+    var answeredNow = dq.filter(function(x){return state.answers[x.qk]!=null;}).length;
     var pct = Math.round(((qsBefore+answeredNow) / totalDiagQuestions()) * 100);
     setProgress(pct, "Dimension "+(state.dimIndex+1)+" / "+DIMENSIONS.length+" — "+(qsBefore+answeredNow)+"/"+totalDiagQuestions()+" questions", dim.name);
 
-    var qHtml = dim.questions.map(function(item, qi){
-      var qk = dim.key+"_"+qi;
+    var qHtml = dq.map(function(x, qi){
+      var item = x.item, qk = x.qk;
       var current = state.answers[qk];
       var optsHtml = item.opts.map(function(optText, oi){
         var val = oi+1;
@@ -816,7 +565,7 @@
       '</div>'+
       '<div class="nav-row">'+
         '<button class="btn ghost" id="diagBack">'+(state.dimIndex===0?'← Accueil':'← Précédent')+'</button>'+
-        '<span class="nav-hint">'+dim.questions.filter(function(_,i){return state.answers[dim.key+"_"+i]!=null;}).length+' / '+dim.questions.length+' répondues</span>'+
+        '<span class="nav-hint">'+answeredNow+' / '+dq.length+' répondues</span>'+
         '<button class="btn accent" id="diagNext" '+(answeredHere?'':'disabled')+'>'+(state.dimIndex===DIMENSIONS.length-1?'Voir mon résultat →':'Suivant →')+'</button>'+
       '</div>'+
       '</div>'
@@ -845,7 +594,7 @@
     hideProgress();
 
     var dimScores = DIMENSIONS.map(function(d){
-      var vals = d.questions.map(function(_,i){ return state.answers[d.key+"_"+i] || 0; });
+      var vals = dimQuestions(d).map(function(x){ var n = state.answers[x.qk]; return n ? scoreOf(x.item, n) : 0; });
       var avg = vals.reduce(function(a,b){return a+b;},0) / vals.length;
       var band = bandFor(avg);
       return { key:d.key, name:d.name, avg:avg, band:band, m:d.matrix[band.mkey] };
