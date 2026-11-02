@@ -165,6 +165,7 @@
     fournisseurs: 0,
     soustraitants: 0,
     identifiant: "qr",
+    chargeClient: false,
     systeme: "tableur",
     connecteERP: false,
     accompagnement: false,
@@ -204,6 +205,16 @@
     if(pieces <= 1500000) return [0.10,0.15];
     return [0.08,0.12];
   }
+  /* NFC : le guide (chapitre 11) le cite sans le chiffrer. Estimation indépendante basée sur les
+     prix de marché d'étiquettes NFC textiles (puce de type NTAG, étiquette tissée ou adhésive) :
+     environ 0,05 à 0,20 USD/étiquette selon le volume, converti en MAD (~10 MAD/USD). Lecture par
+     smartphone, donc pas d'équipement de lecture ; seul un poste d'encodage ponctuel est prévu. */
+  function tarifNFC(pieces){
+    if(pieces <= 300000) return [0.80,2.00];
+    if(pieces <= 1500000) return [0.60,1.50];
+    return [0.40,1.00];
+  }
+  var ENCODAGE_NFC = [5000,15000];
   /* RFID : le guide (chapitre 11) mentionne le RFID comme option pour les grandes
      entreprises à flux logistiques importants, sans le chiffrer. Estimation indépendante
      basée sur les prix de marché réels des étiquettes UHF textiles (inlay adhésif ou tissé,
@@ -230,17 +241,21 @@
     var referentRecur = [referentAn1[0]*0.7, referentAn1[1]*0.7];
 
     var nbFourn = s.regime === "faconpure" ? 0 : s.fournisseurs;
-    var isRFIDClient = s.identifiant === "rfidclient";
-    var isRFID = s.identifiant === "rfid";
-    var idTarif = isRFID ? tarifRFID(s.pieces) : tarifQR(s.pieces);
-    var idAn1 = isRFIDClient ? [0,0] : [s.pieces*idTarif[0], s.pieces*idTarif[1]];
+    var tech = s.identifiant;
+    var isRFID = tech === "rfid", isNFC = tech === "nfc";
+    var idTarif = isRFID ? tarifRFID(s.pieces) : isNFC ? tarifNFC(s.pieces) : tarifQR(s.pieces);
+    var techLabel = isRFID ? "étiquette RFID UHF" : isNFC ? "étiquette NFC" : "QR code";
+    var idAn1 = s.chargeClient ? [0,0] : [s.pieces*idTarif[0], s.pieces*idTarif[1]];
     var idRecur = idAn1.slice();
-    var idName = "Identifiant physique (" + (isRFIDClient ? "RFID fourni par le client" : isRFID ? "étiquette RFID UHF" : "QR code") + ") par pièce";
-    var idNote = isRFIDClient
-      ? "Coût nul pour votre entreprise : le RFID (technologie complexe, prestataires vérifiés) est financé et posé par le donneur d'ordre."
+    var idName = "Identifiant physique (" + techLabel + (s.chargeClient ? ", à la charge du client" : "") + ") par pièce";
+    var idNote = s.chargeClient
+      ? "Coût nul pour votre entreprise : le " + techLabel + " est financé et géré par le donneur d'ordre."
       : fmt(s.pieces)+" pièces/an × "+idTarif[0].toFixed(2)+" à "+idTarif[1].toFixed(2)+" MAD/pièce"+
-      (isRFID ? " — estimation de marché indépendante (le guide ne chiffre pas ce poste), hors équipement de lecture." : ".");
-    var equipAn1 = isRFID ? equipementRFID(s.effectif) : [0,0];
+        (isRFID ? " — estimation de marché indépendante (le guide ne chiffre pas ce poste), hors équipement de lecture."
+          : isNFC ? " — estimation de marché indépendante (le guide ne chiffre pas ce poste), hors encodage."
+          : ".");
+    var equipAn1 = (isRFID && !s.chargeClient) ? equipementRFID(s.effectif) : [0,0];
+    var encodAn1 = (isNFC && !s.chargeClient) ? ENCODAGE_NFC : [0,0];
 
     var systeme = s.systeme;
     var sysAn1, sysRecur, sysNote;
@@ -271,7 +286,11 @@
     if(s.regime !== "faconpure"){
       lines.push({ key:"identifiant", name:idName, an1:idAn1, recur:idRecur, note:idNote });
     }
-    if(isRFID && s.regime !== "faconpure"){
+    if(isNFC && !s.chargeClient && s.regime !== "faconpure"){
+      lines.push({ key:"nfcencod", name:"Encodage des étiquettes NFC (poste de programmation)", an1:encodAn1, recur:[0,0],
+        note:"Investissement ponctuel : lecteur/encodeur NFC et mise en place — repère marché, hors le guide.", recurNote:"Ponctuel, non récurrent." });
+    }
+    if(isRFID && !s.chargeClient && s.regime !== "faconpure"){
       lines.push({ key:"rfidequip", name:"Équipement de lecture RFID (lecteurs, portails)", an1:equipAn1, recur:[0,0],
         note:"Investissement ponctuel : lecteurs portables et/ou portails fixes selon vos flux logistiques — repère marché, hors le guide.", recurNote:"Ponctuel, non récurrent." });
     }
@@ -342,9 +361,11 @@
         '<div class="sub">Le support qui pointe vers le passeport numérique — il ne le remplace pas (chapitre 11).</div>'+
         '<div class="radio-row" id="idRow">'+
           radioId("qr","QR code","Recommandé par défaut : peu coûteux, imprimable sur l\'étiquette de composition existante, compatible avec tout smartphone.")+
-          radioId("rfidclient","RFID à la charge du client (coût nul)","Le donneur d'ordre finance et gère le RFID avec des prestataires vérifiés : aucun coût d'étiquette ni d'équipement pour vous.")+
-          radioId("rfid","RFID (UHF) à votre charge","Option pour les grandes entreprises à flux logistiques importants (guide, ch. 11) — coût par étiquette plus élevé, plus un investissement en lecteurs.")+
+          radioId("nfc","NFC","Puce lisible d\'un simple contact avec un smartphone, sans application : coût par étiquette plus élevé que le QR code (guide, ch. 11).")+
+          radioId("rfid","RFID (UHF)","Option pour les grandes entreprises à flux logistiques importants (guide, ch. 11) — coût par étiquette plus élevé, plus un investissement en lecteurs.")+
         '</div>'+
+        '<label class="checkline" style="margin-top:12px;"><input type="checkbox" id="f_chargeclient" '+(state.chargeClient?'checked':'')+'><span class="ctext"><b>Coût nul : l\'identifiant est à la charge du client</b><span>Cochez si le donneur d\'ordre finance et gère cette technologie. Décochée, le coût est à la charge de votre entreprise.</span></span></label>'+
+
       '</div>')+
       supplySection()+
       '<div class="section">'+
@@ -405,6 +426,7 @@
         state[map[id]] = elx.value === "" ? "" : parseFloat(elx.value);
       });
     });
+    var cc = document.getElementById("f_chargeclient"); if(cc) cc.addEventListener("change", function(){ state.chargeClient = cc.checked; });
     var erp = document.getElementById("f_erp"); if(erp) erp.addEventListener("change", function(){ state.connecteERP = erp.checked; });
     var ac = document.getElementById("f_accomp"); if(ac) ac.addEventListener("change", function(){ state.accompagnement = ac.checked; });
   }
@@ -414,7 +436,7 @@
       regime: state.regime, effectif: state.effectif||1, references: state.references||0,
       pieces: state.pieces||0, caExport: state.caExport||0, fournisseurs: state.fournisseurs||0, soustraitants: state.soustraitants||0,
       
-      identifiant: state.identifiant, systeme: state.systeme, connecteERP: state.connecteERP, accompagnement: state.accompagnement
+      identifiant: state.identifiant, chargeClient: state.chargeClient, systeme: state.systeme, connecteERP: state.connecteERP, accompagnement: state.accompagnement
     };
     var lines = computeLines(s);
     var totalAn1 = [0,0], totalRecur = [0,0];
