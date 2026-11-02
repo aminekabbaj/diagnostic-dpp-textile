@@ -166,6 +166,9 @@
     soustraitants: 0,
     identifiant: "qr",
     chargeClient: false,
+    joursMois: "",
+    tauxJour: "",
+    prixIdentifiant: "",
     systeme: "tableur",
     connecteERP: false,
     accompagnement: false,
@@ -235,8 +238,10 @@
     return [120000,250000];
   }
   function computeLines(s){
-    var jours = tempsInterneJours(s.effectif);
-    var taux = tauxJournalierDefault(s.regime);
+    var joursPerso = s.joursMois !== "" && s.joursMois >= 0;
+    var tauxPerso = s.tauxJour !== "" && s.tauxJour >= 0;
+    var jours = joursPerso ? s.joursMois : tempsInterneJours(s.effectif);
+    var taux = tauxPerso ? s.tauxJour : tauxJournalierDefault(s.regime);
     var referentAn1 = [jours*12*taux*0.9, jours*12*taux*1.15];
     var referentRecur = [referentAn1[0]*0.7, referentAn1[1]*0.7];
 
@@ -245,11 +250,14 @@
     var isRFID = tech === "rfid", isNFC = tech === "nfc";
     var idTarif = isRFID ? tarifRFID(s.pieces) : isNFC ? tarifNFC(s.pieces) : tarifQR(s.pieces);
     var techLabel = isRFID ? "étiquette RFID UHF" : isNFC ? "étiquette NFC" : "QR code";
+    var prixPerso = s.prixIdentifiant !== "" && s.prixIdentifiant >= 0;
+    if(prixPerso) idTarif = [s.prixIdentifiant, s.prixIdentifiant];
     var idAn1 = s.chargeClient ? [0,0] : [s.pieces*idTarif[0], s.pieces*idTarif[1]];
     var idRecur = idAn1.slice();
     var idName = "Identifiant physique (" + techLabel + (s.chargeClient ? ", à la charge du client" : "") + ") par pièce";
     var idNote = s.chargeClient
       ? "Coût nul pour votre entreprise : le " + techLabel + " est financé et géré par le donneur d'ordre."
+      : prixPerso ? fmt(s.pieces)+" pièces/an × "+idTarif[0].toFixed(2)+" MAD/pièce (prix que vous avez saisi)."
       : fmt(s.pieces)+" pièces/an × "+idTarif[0].toFixed(2)+" à "+idTarif[1].toFixed(2)+" MAD/pièce"+
         (isRFID ? " — estimation de marché indépendante (le guide ne chiffre pas ce poste), hors équipement de lecture."
           : isNFC ? " — estimation de marché indépendante (le guide ne chiffre pas ce poste), hors encodage."
@@ -277,7 +285,7 @@
 
     var lines = [
       { key:"referent", name:"Temps interne (référent DPP + contributions ponctuelles)", an1:referentAn1, recur:referentRecur,
-        note: jours+" jours/mois valorisés à "+fmt(taux)+" MAD/jour (coût employeur), à ajuster à votre réalité. Ce temps comprend l'identification et la collecte des données et certificats externes : "+
+        note: jours+" jours/mois valorisés à "+fmt(taux)+" MAD/jour (coût employeur)"+((joursPerso||tauxPerso) ? " — valeurs que vous avez saisies." : ", valeurs par défaut à ajuster à votre réalité.")+" Ce temps comprend l'identification et la collecte des données et certificats externes : "+
           (s.regime==="faconpure" ? "auprès de votre donneur d'ordre (ou de sa plateforme de sourcing) et de vos sous-traitants (broderie, marquage, strass...)."
            : s.regime==="cotraitance" ? "auprès de vos fournisseurs d'intrants et de vos sous-traitants (teinture, ennoblissement, broderie...)."
            : "auprès de vos fournisseurs de matière et de vos ateliers sous-traitants.") +
@@ -355,6 +363,14 @@
           '<div class="field"><label>Chiffre d\'affaires export annuel (MAD)</label><input type="number" id="f_ca" min="0" step="10000" value="'+state.caExport+'"></div>'+
         '</div>'+
       '</div>'+
+      '<div class="section">'+
+        '<h4>Temps interne du référent DPP</h4>'+
+        '<div class="sub">Temps passé à piloter le sujet, cartographier les données et obtenir les certificats externes. Laissez vide pour utiliser la valeur par défaut.</div>'+
+        '<div class="field-grid">'+
+          '<div class="field"><label>Jours par mois consacrés au DPP</label><input type="number" id="f_jours" min="0" step="0.5" placeholder="'+tempsInterneJours(state.effectif||1)+' (par défaut)" value="'+state.joursMois+'"></div>'+
+          '<div class="field"><label>Coût journalier valorisé (MAD / jour)</label><input type="number" id="f_taux" min="0" step="50" placeholder="'+tauxJournalierDefault(state.regime)+' (par défaut)" value="'+state.tauxJour+'"></div>'+
+        '</div>'+
+      '</div>'+
       (state.regime === "faconpure" ? '' :
       '<div class="section">'+
         '<h4>Identifiant physique (étiquette)</h4>'+
@@ -365,6 +381,7 @@
           radioId("rfid","RFID (UHF)","Option pour les grandes entreprises à flux logistiques importants (guide, ch. 11) — coût par étiquette plus élevé, plus un investissement en lecteurs.")+
         '</div>'+
         '<label class="checkline" style="margin-top:12px;"><input type="checkbox" id="f_chargeclient" '+(state.chargeClient?'checked':'')+'><span class="ctext"><b>Coût nul : l\'identifiant est à la charge du client</b><span>Cochez si le donneur d\'ordre finance et gère cette technologie. Décochée, le coût est à la charge de votre entreprise.</span></span></label>'+
+        '<div class="field" style="margin-top:12px;max-width:340px;"><label>Prix unitaire de l\'étiquette (MAD / pièce, facultatif)</label><input type="number" id="f_prixid" min="0" step="0.01" placeholder="Estimation par défaut" value="'+state.prixIdentifiant+'"><span class="hint">Remplace l\'estimation si vous connaissez votre prix. Ignoré si le coût est à la charge du client.</span></div>'+
 
       '</div>')+
       supplySection()+
@@ -419,10 +436,10 @@
     document.querySelectorAll('[data-idtag]').forEach(function(b){
       b.addEventListener("click", function(){ state.identifiant = b.getAttribute("data-idtag"); render(); });
     });
-    ["f_effectif","f_references","f_pieces","f_ca","f_fournisseurs","f_soustraitants","f_partclient"].forEach(function(id){
+    ["f_effectif","f_references","f_pieces","f_ca","f_fournisseurs","f_soustraitants","f_partclient","f_jours","f_taux","f_prixid"].forEach(function(id){
       var elx = document.getElementById(id);
       if(elx) elx.addEventListener("input", function(){
-        var map = {f_effectif:"effectif",f_references:"references",f_pieces:"pieces",f_ca:"caExport",f_fournisseurs:"fournisseurs",f_soustraitants:"soustraitants",f_partclient:"partClient"};
+        var map = {f_effectif:"effectif",f_references:"references",f_pieces:"pieces",f_ca:"caExport",f_fournisseurs:"fournisseurs",f_soustraitants:"soustraitants",f_partclient:"partClient",f_jours:"joursMois",f_taux:"tauxJour",f_prixid:"prixIdentifiant"};
         state[map[id]] = elx.value === "" ? "" : parseFloat(elx.value);
       });
     });
@@ -436,7 +453,7 @@
       regime: state.regime, effectif: state.effectif||1, references: state.references||0,
       pieces: state.pieces||0, caExport: state.caExport||0, fournisseurs: state.fournisseurs||0, soustraitants: state.soustraitants||0,
       
-      identifiant: state.identifiant, chargeClient: state.chargeClient, systeme: state.systeme, connecteERP: state.connecteERP, accompagnement: state.accompagnement
+      identifiant: state.identifiant, chargeClient: state.chargeClient, joursMois: state.joursMois, tauxJour: state.tauxJour, prixIdentifiant: state.prixIdentifiant, systeme: state.systeme, connecteERP: state.connecteERP, accompagnement: state.accompagnement
     };
     var lines = computeLines(s);
     var totalAn1 = [0,0], totalRecur = [0,0];
