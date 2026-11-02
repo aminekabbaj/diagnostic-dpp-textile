@@ -164,10 +164,8 @@
     caExport: 8000000,
     fournisseurs: 0,
     soustraitants: 0,
-    controleQualite: false,
-    essaisGratuits: false,
     identifiant: "qr",
-    systeme: "auto",
+    systeme: "tableur",
     connecteERP: false,
     accompagnement: false,
     partClient: "",
@@ -225,12 +223,6 @@
     if(effectif <= 300) return [60000,120000];
     return [120000,250000];
   }
-  function suggestSysteme(references, effectif){
-    if(references <= 15) return "tableur";
-    if(references <= 50 && effectif <= 300) return "pim";
-    return "pimerp";
-  }
-
   function computeLines(s){
     var jours = tempsInterneJours(s.effectif);
     var taux = tauxJournalierDefault(s.regime);
@@ -241,10 +233,6 @@
     var cartoNote = s.references > 10
       ? (s.effectif > 150 ? "Souvent déjà inclus dans le temps interne pour une grande équipe projet — ne comptez pas les deux." : "Cartographie sur " + s.references + " références.")
       : "Inclus dans le temps interne (portefeuille limité).";
-
-    var couverture = s.controleQualite ? 0.45 : 0;
-    var essaisAn1 = s.essaisGratuits ? [0,0] : [s.references*3*300*(1-couverture), s.references*3*600*(1-couverture)];
-    var essaisRecur = essaisAn1.slice();
 
     var fournAn1 = s.regime === "faconpure" ? [0,0] : [s.fournisseurs*1250, s.fournisseurs*2000];
     var auditAn1 = [s.soustraitants*1500, s.soustraitants*3000];
@@ -261,7 +249,7 @@
       (isRFID ? " — estimation de marché indépendante (le guide ne chiffre pas ce poste), hors équipement de lecture." : ".");
     var equipAn1 = isRFID ? equipementRFID(s.effectif) : [0,0];
 
-    var systeme = s.systeme === "auto" ? suggestSysteme(s.references, s.effectif) : s.systeme;
+    var systeme = s.systeme;
     var sysAn1, sysRecur, sysNote;
     if(systeme === "tableur"){
       sysAn1 = [0,0]; sysRecur = [0,0]; sysNote = "Tableur structuré — aucun coût logiciel.";
@@ -283,15 +271,12 @@
       { key:"referent", name:"Temps interne (référent DPP + contributions ponctuelles)", an1:referentAn1, recur:referentRecur,
         note: jours+" jours/mois valorisés à "+fmt(taux)+" MAD/jour (coût employeur), à ajuster à votre réalité." },
       { key:"carto", name:"Cartographie des données", an1:cartoAn1, recur:[0,0], note:cartoNote, recurNote:"Ponctuel, non récurrent." },
-      { key:"essais", name:"Essais de robustesse en laboratoire", an1:essaisAn1, recur:essaisRecur,
-        note: s.essaisGratuits ? "Essais réalisés sans frais supplémentaires (coût nul pour votre entreprise)."
-          : s.references+" référence(s) × 3 essais × 300-600 MAD"+(couverture>0?" (45% déjà couverts par votre contrôle qualité)":"")+"." },
-      { key:"fourn", name:"Certificats et négociation fournisseurs", an1:fournAn1, recur:fournAn1,
-        note: s.regime==="faconpure" ? "Sans objet : la matière est fournie par le donneur d'ordre." : s.fournisseurs+" fournisseur(s) de matière." },
-      { key:"audit", name:"Audit des sous-traitants (teinture, ennoblissement...)", an1:auditAn1, recur:auditAn1,
+      { key:"audit", name:(s.regime==="faconpure" ? "Audit des sous-traitants (broderie, marquage, strass...)" : s.regime==="cotraitance" ? "Audit des sous-traitants (teinture, ennoblissement, broderie...)" : "Audit des ateliers sous-traitants (filature, tissage, teinture, confection...)"), an1:auditAn1, recur:auditAn1,
         note: s.soustraitants>0 ? s.soustraitants+" atelier(s) sous-traitant(s) à auditer." : "Aucun sous-traitant déclaré." },
     ];
     if(s.regime !== "faconpure"){
+      lines.push({ key:"fourn", name:"Certificats et négociation fournisseurs", an1:fournAn1, recur:fournAn1,
+        note: s.fournisseurs+" fournisseur(s) de matière." });
       lines.push({ key:"identifiant", name:idName, an1:idAn1, recur:idRecur, note:idNote });
     }
     if(isRFID && s.regime !== "faconpure"){
@@ -355,7 +340,7 @@
         '<div class="field-grid">'+
           '<div class="field"><label>Effectif (nombre de salariés)</label><input type="number" id="f_effectif" min="1" value="'+state.effectif+'"></div>'+
           '<div class="field"><label>Références exportées vers l\'UE</label><input type="number" id="f_references" min="0" value="'+state.references+'"></div>'+
-          '<div class="field"><label>Pièces exportées par an</label><input type="number" id="f_pieces" min="0" step="1000" value="'+state.pieces+'"></div>'+
+          (state.regime === "faconpure" ? '' : '<div class="field"><label>Pièces exportées par an</label><input type="number" id="f_pieces" min="0" step="1000" value="'+state.pieces+'"></div>')+
           '<div class="field"><label>Chiffre d\'affaires export annuel (MAD)</label><input type="number" id="f_ca" min="0" step="10000" value="'+state.caExport+'"></div>'+
         '</div>'+
       '</div>'+
@@ -369,32 +354,43 @@
           radioId("rfid","RFID (UHF) à votre charge","Option pour les grandes entreprises à flux logistiques importants (guide, ch. 11) — coût par étiquette plus élevé, plus un investissement en lecteurs.")+
         '</div>'+
       '</div>')+
-      '<div class="section">'+
-        '<h4>Chaîne d\'approvisionnement</h4>'+
-        '<div class="sub">Sans objet pour la façon pure si la matière est fournie par le donneur d\'ordre.</div>'+
-        '<div class="field-grid">'+
-          '<div class="field"><label>Fournisseurs de matière à certifier</label><input type="number" id="f_fournisseurs" min="0" value="'+state.fournisseurs+'"><span class="hint">0 si la matière vous est fournie</span></div>'+
-          '<div class="field"><label>Sous-traitants à auditer (teinture, broderie...)</label><input type="number" id="f_soustraitants" min="0" value="'+state.soustraitants+'"></div>'+
-        '</div>'+
-      '</div>'+
+      supplySection()+
       '<div class="section">'+
         '<h4>Système d\'information cible</h4>'+
-        '<div class="sub">« Auto » applique la recommandation du guide selon votre taille (chapitre 11).</div>'+
+        '<div class="sub">Le choix de l\'outil vient après la donnée (chapitre 11) : le tableur structuré suffit pour démarrer.</div>'+
         '<div class="radio-row" id="sysRow">'+
-          radioSys("auto","Recommandation automatique","Basée sur votre nombre de références et votre effectif.")+
           radioSys("tableur","Tableur structuré","Aucun coût logiciel — point de départ pour toute PME.")+
           radioSys("pim","PIM en mode SaaS","2 000 à 10 000 MAD/mois selon le volume de références.")+
         '</div>'+
-        '<label class="checkline" style="margin-top:10px;" id="erpLine"><input type="checkbox" id="f_erp" '+(state.connecteERP?'checked':'')+'><span class="ctext"><b>Connecter le PIM à mon ERP existant</b><span>Ajoute un coût d\'intégration ponctuel de 30 000 à 50 000 MAD (pertinent au-delà de 50 références).</span></span></label>'+
+        (state.systeme === "pim" ? '<label class="checkline" style="margin-top:10px;" id="erpLine"><input type="checkbox" id="f_erp" '+(state.connecteERP?'checked':'')+'><span class="ctext"><b>Connecter le PIM à mon ERP existant</b><span>Ajoute un coût d\'intégration ponctuel de 30 000 à 50 000 MAD (pertinent au-delà de 50 références).</span></span></label>' : '')+
       '</div>'+
       '<div class="section">'+
         '<h4>Hypothèses complémentaires</h4>'+
-        '<label class="checkline"><input type="checkbox" id="f_cq" '+(state.controleQualite?'checked':'')+'><span class="ctext"><b>Nous disposons déjà d\'un contrôle qualité formalisé</b><span>Réduit d\'environ 45% le coût des essais de robustesse déjà couverts en interne.</span></span></label>'+
-        '<label class="checkline" style="margin-top:10px;"><input type="checkbox" id="f_essaisgratuits" '+(state.essaisGratuits?'checked':'')+'><span class="ctext"><b>Les essais de robustesse en laboratoire sont réalisés sans frais supplémentaires</b><span>Met ce poste à zéro (essais déjà inclus dans votre prestation ou pris en charge par un tiers).</span></span></label>'+
-        '<label class="checkline" style="margin-top:10px;"><input type="checkbox" id="f_accomp" '+(state.accompagnement?'checked':'')+'><span class="ctext"><b>Prévoir un accompagnement externe ponctuel (conseil)</b><span>Facultatif, plutôt pertinent au-delà de 300 salariés — 50 000 à 100 000 MAD.</span></span></label>'+
+        '<label class="checkline"><input type="checkbox" id="f_accomp" '+(state.accompagnement?'checked':'')+'><span class="ctext"><b>Prévoir un accompagnement externe ponctuel (conseil)</b><span>Facultatif, plutôt pertinent au-delà de 300 salariés — 50 000 à 100 000 MAD.</span></span></label>'+
         '<div class="field" style="margin-top:14px;max-width:340px;"><label>Part de votre CA export représentée par votre principal donneur d\'ordre (%, facultatif)</label><input type="number" id="f_partclient" min="0" max="100" placeholder="Ex. 15" value="'+state.partClient+'"><span class="hint">Permet de chiffrer le coût de l\'inaction en cas de perte de ce client.</span></div>'+
       '</div>'
     );
+  }
+  function supplySection(){
+    var r = state.regime;
+    var title = r === "faconpure" ? "Sous-traitance" : "Chaîne d\'approvisionnement";
+    var sub = r === "faconpure"
+      ? "La matière vous est fournie : aucune donnée matière à certifier. Seules comptent les opérations que vous confiez vous-même à des tiers."
+      : r === "cotraitance"
+        ? "Vous achetez tout ou partie des intrants : vous devenez le seul à pouvoir documenter leur origine et leur composition."
+        : "Vous achetez vos matières et pilotez plusieurs étapes : chaque fournisseur et chaque atelier sous-traitant est un maillon à documenter.";
+    var fournLabel = r === "cotraitance" ? "Fournisseurs des intrants que vous achetez (à certifier)" : "Fournisseurs de matière à certifier";
+    var stLabel = r === "faconpure" ? "Sous-traitants à qui vous confiez des opérations (broderie, marquage, strass...)"
+      : r === "cotraitance" ? "Sous-traitants à auditer (teinture, ennoblissement, broderie...)"
+      : "Ateliers sous-traitants à auditer (filature, tissage, teinture, confection...)";
+    return '<div class="section">'+
+      '<h4>'+title+'</h4>'+
+      '<div class="sub">'+sub+'</div>'+
+      '<div class="field-grid">'+
+        (r === "faconpure" ? '' : '<div class="field"><label>'+fournLabel+'</label><input type="number" id="f_fournisseurs" min="0" value="'+state.fournisseurs+'"></div>')+
+        '<div class="field"><label>'+stLabel+'</label><input type="number" id="f_soustraitants" min="0" value="'+state.soustraitants+'"></div>'+
+      '</div>'+
+    '</div>';
   }
   function radioSys(key,label,sub){
     return '<label class="radio-opt'+(state.systeme===key?' sel':'')+'" data-sys="'+key+'"><span class="dotmark"></span><span class="rtext"><b>'+label+'</b><span>'+sub+'</span></span></label>';
@@ -421,8 +417,6 @@
       });
     });
     var erp = document.getElementById("f_erp"); if(erp) erp.addEventListener("change", function(){ state.connecteERP = erp.checked; });
-    var cq = document.getElementById("f_cq"); if(cq) cq.addEventListener("change", function(){ state.controleQualite = cq.checked; });
-    var eg = document.getElementById("f_essaisgratuits"); if(eg) eg.addEventListener("change", function(){ state.essaisGratuits = eg.checked; });
     var ac = document.getElementById("f_accomp"); if(ac) ac.addEventListener("change", function(){ state.accompagnement = ac.checked; });
   }
 
@@ -430,7 +424,7 @@
     var s = {
       regime: state.regime, effectif: state.effectif||1, references: state.references||0,
       pieces: state.pieces||0, caExport: state.caExport||0, fournisseurs: state.fournisseurs||0,
-      soustraitants: state.soustraitants||0, controleQualite: state.controleQualite, essaisGratuits: state.essaisGratuits,
+      soustraitants: state.soustraitants||0, 
       identifiant: state.identifiant, systeme: state.systeme, connecteERP: state.connecteERP, accompagnement: state.accompagnement
     };
     var lines = computeLines(s);
