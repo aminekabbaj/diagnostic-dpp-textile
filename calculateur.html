@@ -228,11 +228,6 @@
     var referentAn1 = [jours*12*taux*0.9, jours*12*taux*1.15];
     var referentRecur = [referentAn1[0]*0.7, referentAn1[1]*0.7];
 
-    var cartoAn1 = s.references > 10 ? [s.references*400, s.references*600] : [0,0];
-    var cartoNote = s.references > 10
-      ? (s.effectif > 150 ? "Souvent déjà inclus dans le temps interne pour une grande équipe projet — ne comptez pas les deux." : "Cartographie sur " + s.references + " références.")
-      : "Inclus dans le temps interne (portefeuille limité).";
-
     var fournAn1 = s.regime === "faconpure" ? [0,0] : [s.fournisseurs*1250, s.fournisseurs*2000];
     var isRFIDClient = s.identifiant === "rfidclient";
     var isRFID = s.identifiant === "rfid";
@@ -269,11 +264,10 @@
         note: jours+" jours/mois valorisés à "+fmt(taux)+" MAD/jour (coût employeur), à ajuster à votre réalité. Ce temps comprend l'identification et la collecte des données et certificats externes : "+
           (s.regime==="faconpure" ? "auprès de votre donneur d'ordre (ou de sa plateforme de sourcing) et de vos sous-traitants (broderie, marquage, strass...)."
            : s.regime==="cotraitance" ? "auprès de vos fournisseurs d'intrants et de vos sous-traitants (teinture, ennoblissement, broderie...)."
-           : "auprès de vos fournisseurs de matière et de vos ateliers sous-traitants.") },
-      { key:"carto", name:"Cartographie des données", an1:cartoAn1, recur:[0,0], note:cartoNote, recurNote:"Ponctuel, non récurrent." },
+           : "auprès de vos fournisseurs de matière et de vos ateliers sous-traitants.") }
     ];
     if(s.regime !== "faconpure"){
-      lines.push({ key:"fourn", name:"Certificats et négociation fournisseurs", an1:fournAn1, recur:fournAn1,
+      lines.push({ key:"fourn", name:"Cartographie des données externes et obtention des certificats", an1:fournAn1, recur:fournAn1,
         note: s.fournisseurs+" fournisseur(s) de matière." });
       lines.push({ key:"identifiant", name:idName, an1:idAn1, recur:idRecur, note:idNote });
     }
