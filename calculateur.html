@@ -271,8 +271,8 @@
       { key:"referent", name:"Temps interne (référent DPP + contributions ponctuelles)", an1:referentAn1, recur:referentRecur,
         note: jours+" jours/mois valorisés à "+fmt(taux)+" MAD/jour (coût employeur), à ajuster à votre réalité." },
       { key:"carto", name:"Cartographie des données", an1:cartoAn1, recur:[0,0], note:cartoNote, recurNote:"Ponctuel, non récurrent." },
-      { key:"audit", name:(s.regime==="faconpure" ? "Audit des sous-traitants (broderie, marquage, strass...)" : s.regime==="cotraitance" ? "Audit des sous-traitants (teinture, ennoblissement, broderie...)" : "Audit des ateliers sous-traitants (filature, tissage, teinture, confection...)"), an1:auditAn1, recur:auditAn1,
-        note: s.soustraitants>0 ? s.soustraitants+" atelier(s) sous-traitant(s) à auditer." : "Aucun sous-traitant déclaré." },
+      { key:"audit", name:(s.regime==="faconpure" ? "Cartographie des données externes (sous-traitants : broderie, marquage, strass...)" : s.regime==="cotraitance" ? "Cartographie des données externes (sous-traitants : teinture, ennoblissement, broderie...)" : "Cartographie des données externes (ateliers sous-traitants : filature, tissage, teinture, confection...)"), an1:auditAn1, recur:auditAn1,
+        note: s.soustraitants>0 ? s.soustraitants+" atelier(s) sous-traitant(s) à cartographier." : "Aucun sous-traitant déclaré." },
     ];
     if(s.regime !== "faconpure"){
       lines.push({ key:"fourn", name:"Certificats et négociation fournisseurs", an1:fournAn1, recur:fournAn1,
@@ -381,8 +381,8 @@
         : "Vous achetez vos matières et pilotez plusieurs étapes : chaque fournisseur et chaque atelier sous-traitant est un maillon à documenter.";
     var fournLabel = r === "cotraitance" ? "Fournisseurs des intrants que vous achetez (à certifier)" : "Fournisseurs de matière à certifier";
     var stLabel = r === "faconpure" ? "Sous-traitants à qui vous confiez des opérations (broderie, marquage, strass...)"
-      : r === "cotraitance" ? "Sous-traitants à auditer (teinture, ennoblissement, broderie...)"
-      : "Ateliers sous-traitants à auditer (filature, tissage, teinture, confection...)";
+      : r === "cotraitance" ? "Sous-traitants à cartographier (teinture, ennoblissement, broderie...)"
+      : "Ateliers sous-traitants à cartographier (filature, tissage, teinture, confection...)";
     return '<div class="section">'+
       '<h4>'+title+'</h4>'+
       '<div class="sub">'+sub+'</div>'+
