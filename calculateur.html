@@ -266,7 +266,10 @@
 
     var lines = [
       { key:"referent", name:"Temps interne (référent DPP + contributions ponctuelles)", an1:referentAn1, recur:referentRecur,
-        note: jours+" jours/mois valorisés à "+fmt(taux)+" MAD/jour (coût employeur), à ajuster à votre réalité." },
+        note: jours+" jours/mois valorisés à "+fmt(taux)+" MAD/jour (coût employeur), à ajuster à votre réalité. Ce temps comprend l'identification et la collecte des données et certificats externes : "+
+          (s.regime==="faconpure" ? "auprès de votre donneur d'ordre (ou de sa plateforme de sourcing) et de vos sous-traitants (broderie, marquage, strass...)."
+           : s.regime==="cotraitance" ? "auprès de vos fournisseurs d'intrants et de vos sous-traitants (teinture, ennoblissement, broderie...)."
+           : "auprès de vos fournisseurs de matière et de vos ateliers sous-traitants.") },
       { key:"carto", name:"Cartographie des données", an1:cartoAn1, recur:[0,0], note:cartoNote, recurNote:"Ponctuel, non récurrent." },
     ];
     if(s.regime !== "faconpure"){
