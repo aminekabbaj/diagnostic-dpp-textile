@@ -163,7 +163,6 @@
     pieces: 150000,
     caExport: 8000000,
     fournisseurs: 0,
-    soustraitants: 0,
     identifiant: "qr",
     systeme: "tableur",
     connecteERP: false,
@@ -235,8 +234,6 @@
       : "Inclus dans le temps interne (portefeuille limité).";
 
     var fournAn1 = s.regime === "faconpure" ? [0,0] : [s.fournisseurs*1250, s.fournisseurs*2000];
-    var auditAn1 = [s.soustraitants*1500, s.soustraitants*3000];
-
     var isRFIDClient = s.identifiant === "rfidclient";
     var isRFID = s.identifiant === "rfid";
     var idTarif = isRFID ? tarifRFID(s.pieces) : tarifQR(s.pieces);
@@ -271,8 +268,6 @@
       { key:"referent", name:"Temps interne (référent DPP + contributions ponctuelles)", an1:referentAn1, recur:referentRecur,
         note: jours+" jours/mois valorisés à "+fmt(taux)+" MAD/jour (coût employeur), à ajuster à votre réalité." },
       { key:"carto", name:"Cartographie des données", an1:cartoAn1, recur:[0,0], note:cartoNote, recurNote:"Ponctuel, non récurrent." },
-      { key:"audit", name:(s.regime==="faconpure" ? "Cartographie des données externes (sous-traitants : broderie, marquage, strass...)" : s.regime==="cotraitance" ? "Cartographie des données externes (sous-traitants : teinture, ennoblissement, broderie...)" : "Cartographie des données externes (ateliers sous-traitants : filature, tissage, teinture, confection...)"), an1:auditAn1, recur:auditAn1,
-        note: s.soustraitants>0 ? s.soustraitants+" atelier(s) sous-traitant(s) à cartographier." : "Aucun sous-traitant déclaré." },
     ];
     if(s.regime !== "faconpure"){
       lines.push({ key:"fourn", name:"Certificats et négociation fournisseurs", an1:fournAn1, recur:fournAn1,
@@ -373,22 +368,16 @@
   }
   function supplySection(){
     var r = state.regime;
-    var title = r === "faconpure" ? "Sous-traitance" : "Chaîne d\'approvisionnement";
-    var sub = r === "faconpure"
-      ? "La matière vous est fournie : aucune donnée matière à certifier. Seules comptent les opérations que vous confiez vous-même à des tiers."
-      : r === "cotraitance"
-        ? "Vous achetez tout ou partie des intrants : vous devenez le seul à pouvoir documenter leur origine et leur composition."
-        : "Vous achetez vos matières et pilotez plusieurs étapes : chaque fournisseur et chaque atelier sous-traitant est un maillon à documenter.";
+    if(r === "faconpure") return '';
+    var sub = r === "cotraitance"
+      ? "Vous achetez tout ou partie des intrants : vous devenez le seul à pouvoir documenter leur origine et leur composition."
+      : "Vous achetez vos matières et pilotez plusieurs étapes : chaque fournisseur est un maillon à documenter.";
     var fournLabel = r === "cotraitance" ? "Fournisseurs des intrants que vous achetez (à certifier)" : "Fournisseurs de matière à certifier";
-    var stLabel = r === "faconpure" ? "Sous-traitants à qui vous confiez des opérations (broderie, marquage, strass...)"
-      : r === "cotraitance" ? "Sous-traitants à cartographier (teinture, ennoblissement, broderie...)"
-      : "Ateliers sous-traitants à cartographier (filature, tissage, teinture, confection...)";
     return '<div class="section">'+
-      '<h4>'+title+'</h4>'+
+      '<h4>Chaîne d\'approvisionnement</h4>'+
       '<div class="sub">'+sub+'</div>'+
       '<div class="field-grid">'+
-        (r === "faconpure" ? '' : '<div class="field"><label>'+fournLabel+'</label><input type="number" id="f_fournisseurs" min="0" value="'+state.fournisseurs+'"></div>')+
-        '<div class="field"><label>'+stLabel+'</label><input type="number" id="f_soustraitants" min="0" value="'+state.soustraitants+'"></div>'+
+        '<div class="field"><label>'+fournLabel+'</label><input type="number" id="f_fournisseurs" min="0" value="'+state.fournisseurs+'"></div>'+
       '</div>'+
     '</div>';
   }
@@ -409,10 +398,10 @@
     document.querySelectorAll('[data-idtag]').forEach(function(b){
       b.addEventListener("click", function(){ state.identifiant = b.getAttribute("data-idtag"); render(); });
     });
-    ["f_effectif","f_references","f_pieces","f_ca","f_fournisseurs","f_soustraitants","f_partclient"].forEach(function(id){
+    ["f_effectif","f_references","f_pieces","f_ca","f_fournisseurs","f_partclient"].forEach(function(id){
       var elx = document.getElementById(id);
       if(elx) elx.addEventListener("input", function(){
-        var map = {f_effectif:"effectif",f_references:"references",f_pieces:"pieces",f_ca:"caExport",f_fournisseurs:"fournisseurs",f_soustraitants:"soustraitants",f_partclient:"partClient"};
+        var map = {f_effectif:"effectif",f_references:"references",f_pieces:"pieces",f_ca:"caExport",f_fournisseurs:"fournisseurs",f_partclient:"partClient"};
         state[map[id]] = elx.value === "" ? "" : parseFloat(elx.value);
       });
     });
@@ -424,7 +413,7 @@
     var s = {
       regime: state.regime, effectif: state.effectif||1, references: state.references||0,
       pieces: state.pieces||0, caExport: state.caExport||0, fournisseurs: state.fournisseurs||0,
-      soustraitants: state.soustraitants||0, 
+      
       identifiant: state.identifiant, systeme: state.systeme, connecteERP: state.connecteERP, accompagnement: state.accompagnement
     };
     var lines = computeLines(s);
