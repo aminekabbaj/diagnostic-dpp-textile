@@ -230,8 +230,6 @@
     var referentRecur = [referentAn1[0]*0.7, referentAn1[1]*0.7];
 
     var nbFourn = s.regime === "faconpure" ? 0 : s.fournisseurs;
-    var nbExternes = nbFourn + s.soustraitants;
-    var fournAn1 = [nbExternes*1250, nbExternes*2000];
     var isRFIDClient = s.identifiant === "rfidclient";
     var isRFID = s.identifiant === "rfid";
     var idTarif = isRFID ? tarifRFID(s.pieces) : tarifQR(s.pieces);
@@ -267,13 +265,9 @@
         note: jours+" jours/mois valorisés à "+fmt(taux)+" MAD/jour (coût employeur), à ajuster à votre réalité. Ce temps comprend l'identification et la collecte des données et certificats externes : "+
           (s.regime==="faconpure" ? "auprès de votre donneur d'ordre (ou de sa plateforme de sourcing) et de vos sous-traitants (broderie, marquage, strass...)."
            : s.regime==="cotraitance" ? "auprès de vos fournisseurs d'intrants et de vos sous-traitants (teinture, ennoblissement, broderie...)."
-           : "auprès de vos fournisseurs de matière et de vos ateliers sous-traitants.") }
+           : "auprès de vos fournisseurs de matière et de vos ateliers sous-traitants.") +
+          ((nbFourn>0 || s.soustraitants>0) ? " Périmètre déclaré : " + (nbFourn>0 ? nbFourn+" fournisseur(s) d'intrants" : "") + (nbFourn>0 && s.soustraitants>0 ? " et " : "") + (s.soustraitants>0 ? s.soustraitants+" sous-traitant(s)" : "") + "." : "") }
     ];
-    if(nbExternes > 0){
-      lines.push({ key:"fourn", name:"Cartographie des données externes et obtention des certificats", an1:fournAn1, recur:fournAn1,
-        note: (nbFourn>0 ? nbFourn+" fournisseur(s) d'intrants" : "") + (nbFourn>0 && s.soustraitants>0 ? " + " : "") +
-          (s.soustraitants>0 ? s.soustraitants+" sous-traitant(s)" : "") + " × 1 250 à 2 000 MAD (collecte des données et des certificats)." });
-    }
     if(s.regime !== "faconpure"){
       lines.push({ key:"identifiant", name:idName, an1:idAn1, recur:idRecur, note:idNote });
     }
